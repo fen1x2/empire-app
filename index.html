@@ -1,337 +1,89 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Империя Друзей 2.0</title>
-    <script src="https://telegram.org"></script>
-    <style>
-        :root {
-            --bg: #0f172a; --card: #1e293b; --accent: #f59e0b;
-            --green: #10b981; --red: #ef4444; --text: #f8fafc; --muted: #94a3b8;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; user-select: none; }
-        body { background: var(--bg); color: var(--text); padding-bottom: 80px; overflow-x: hidden; }
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--card); border-bottom: 1px solid #334155; position: sticky; top: 0; z-index: 10; }
-        .balance { font-size: 18px; font-weight: bold; color: var(--accent); }
-        .tab-content { display: none; padding: 15px; animation: fadeIn 0.2s; }
-        .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .card { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 12px; border: 1px solid #334155; }
-        h2 { font-size: 18px; margin-bottom: 12px; }
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; color: #fff; transition: 0.1s; }
-        .btn:active { transform: scale(0.98); }
-        .btn-gold { background: linear-gradient(45deg, #d97706, #f59e0b); color: #000; }
-        .btn-green { background: var(--green); }
-        .btn-red { background: var(--red); }
-        .btn-blue { background: #3b82f6; }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        
-        /* Космо-Краш */
-        .crash-box { position: relative; height: 200px; background: #020617; border-radius: 12px; overflow: hidden; margin-bottom: 12px; border: 1px solid #334155; display: flex; align-items: center; justify-content: center; }
-        #crash-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-        .multiplier { position: relative; z-index: 2; font-size: 42px; font-weight: 900; text-shadow: 0 0 15px rgba(0,0,0,0.8); }
-        .bet-controls { display: flex; gap: 10px; margin-bottom: 10px; }
-        .bet-input { width: 50%; padding: 12px; border-radius: 10px; border: 1px solid #475569; background: #0f172a; color: #fff; font-size: 16px; text-align: center; }
-        
-        /* Списки (Биржа, Задания, Магазин) */
-        .item-row { display: flex; justify-content: space-between; align-items: center; }
-        .item-info h3 { font-size: 15px; margin-bottom: 4px; }
-        .item-info p { font-size: 12px; color: var(--muted); }
-        .item-action { width: 110px; }
-        .item-action .btn { padding: 8px; font-size: 13px; }
-        
-        /* Нижнее меню */
-        .nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--card); display: flex; border-top: 1px solid #334155; z-index: 20; }
-        .nav-btn { flex: 1; padding: 10px 5px; background: none; border: none; color: var(--muted); font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
-        .nav-btn.active { color: var(--accent); font-weight: bold; }
-        .nav-icon { font-size: 20px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Империя Друзей 2.0</title>
+<script src="https://telegram.org"></script>
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--accent:#f59e0b;--green:#10b981;--red:#ef4444;--text:#f8fafc;--muted:#94a3b8}
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,sans-serif;user-select:none}
+body{background:var(--bg);color:var(--text);padding-bottom:80px;overflow-x:hidden}
+.header{display:flex;justify-content:space-between;align-items:center;padding:15px;background:var(--card);border-bottom:1px solid #334155;position:sticky;top:0;z-index:10}
+.balance{font-size:18px;font-weight:700;color:var(--accent)}
+.tab{display:none;padding:15px}.tab.active{display:block}
+.card{background:var(--card);border-radius:12px;padding:15px;margin-bottom:12px;border:1px solid #334155}
+h2{font-size:18px;margin-bottom:12px}
+.btn{width:100%;padding:12px;border:none;border-radius:10px;font-weight:700;font-size:16px;cursor:pointer;color:#fff}
+.btn-gold{background:linear-gradient(45deg,#d97706,#f59e0b);color:#000}
+.btn-green{background:var(--green)}.btn-red{background:var(--red)}.btn-blue{background:#3b82f6}
+.btn:disabled{opacity:.5}
+.crash-box{position:relative;height:200px;background:#020617;border-radius:12px;overflow:hidden;margin-bottom:12px;border:1px solid #334155;display:flex;align-items:center;justify-content:center}
+#cv{position:absolute;top:0;left:0;width:100%;height:100%}
+.mult{position:relative;z-index:2;font-size:42px;font-weight:900;text-shadow:0 0 15px #000}
+.row{display:flex;gap:10px;margin-bottom:10px}
+.inp{width:50%;padding:12px;border-radius:10px;border:1px solid #475569;background:#0f172a;color:#fff;font-size:16px;text-align:center}
+.item{display:flex;justify-content:space-between;align-items:center}
+.info h3{font-size:15px;margin-bottom:4px}.info p{font-size:12px;color:var(--muted)}
+.act{width:110px}.act .btn{padding:8px;font-size:13px}
+.nav{position:fixed;bottom:0;left:0;width:100%;background:var(--card);display:flex;border-top:1px solid #334155;z-index:20}
+.nbtn{flex:1;padding:10px 5px;background:0 0;border:none;color:var(--muted);font-size:11px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.nbtn.active{color:var(--accent);font-weight:700}
+</style>
 </head>
 <body>
-    <div class="header">
-        <div>👑 <b id="user-name">Император</b></div>
-        <div class="balance">🪙 <span id="balance">1000</span></div>
-    </div>
+<div class="header"><div>👑 <b id="uname">Император</b></div><div class="balance">🪙 <span id="bal">1000</span></div></div>
 
-    <!-- ВКЛАДКА 1: КОСМО-КРАШ -->
-    <div id="tab-crash" class="tab-content active">
-        <h2>🚀 Космо-Краш</h2>
-        <div class="crash-box">
-            <canvas id="crash-canvas"></canvas>
-            <div class="multiplier" id="mult-display">1.00x</div>
-        </div>
-        <div class="card">
-            <div class="bet-controls">
-                <input type="number" id="bet-amount" class="bet-input" value="100" min="10">
-                <button class="btn btn-blue" style="width: 50%;" onclick="doubleBet()">x2 Ставка</button>
-            </div>
-            <button id="crash-btn" class="btn btn-green" onclick="handleCrashAction()">ПОЛЕТЕЛИ (Ставка)</button>
-        </div>
-    </div>
+<div id="t-crash" class="tab active">
+<h2>🚀 Космо-Краш</h2>
+<div class="crash-box"><canvas id="cv"></canvas><div class="mult" id="md">1.00x</div></div>
+<div class="card">
+<div class="row"><input type="number" id="bet" class="inp" value="100" min="10"><button class="btn btn-blue" style="width:50%" onclick="x2()">x2 Ставка</button></div>
+<button id="cbtn" class="btn btn-green" onclick="play()">ПОЛЕТЕЛИ (Ставка)</button>
+</div>
+</div>
 
-    <!-- ВКЛАДКА 2: БИРЖА ИГРОКОВ -->
-    <div id="tab-market" class="tab-content">
-        <h2>📈 Биржа Игроков</h2>
-        <p style="font-size: 13px; color: var(--muted); margin-bottom: 12px;">Покупай игроков — они приносят монеты каждую секунду! Доход: <b style="color: var(--green);">+<span id="passive-income">0</span>/сек</b></p>
-        <div id="market-list"></div>
-    </div>
+<div id="t-market" class="tab">
+<h2>📈 Биржа Игроков</h2>
+<p style="font-size:13px;color:var(--muted);margin-bottom:12px">Доход: <b style="color:var(--green)">+<span id="inc">0</span>/сек</b></p>
+<div id="mlist"></div>
+</div>
 
-    <!-- ВКЛАДКА 3: ЗАДАНИЯ -->
-    <div id="tab-tasks" class="tab-content">
-        <h2>🎯 Задания спонсоров</h2>
-        <div id="tasks-list"></div>
-    </div>
+<div id="t-tasks" class="tab"><h2>🎯 Задания</h2><div id="tlist"></div></div>
 
-    <!-- ВКЛАДКА 4: МАГАЗИН STARS -->
-    <div id="tab-shop" class="tab-content">
-        <h2>⭐ Магазин за Stars</h2>
-        <div class="card item-row">
-            <div class="item-info">
-                <h3>💰 Мешок монет (+10,000)</h3>
-                <p>Моментальное пополнение баланса</p>
-            </div>
-            <div class="item-action">
-                <button class="btn btn-gold" onclick="buyStarsItem('coins_10k', 50)">50 ⭐</button>
-            </div>
-        </div>
-        <div class="card item-row">
-            <div class="item-info">
-                <h3>👑 VIP-Статус (x2 доход)</h3>
-                <p>Удваивает доход с биржи навсегда</p>
-            </div>
-            <div class="item-action">
-                <button class="btn btn-gold" onclick="buyStarsItem('vip_status', 150)">150 ⭐</button>
-            </div>
-        </div>
-        <div class="card item-row">
-            <div class="item-info">
-                <h3>🚀 Страховка ракеты</h3>
-                <p>Возврат 50% при взрыве (5 игр)</p>
-            </div>
-            <div class="item-action">
-                <button class="btn btn-gold" onclick="buyStarsItem('rocket_shield', 75)">75 ⭐</button>
-            </div>
-        </div>
-    </div>
+<div id="t-shop" class="tab">
+<h2>⭐ Магазин Stars</h2>
+<div class="card item"><div class="info"><h3>💰 +10,000 монет</h3><p>Моментально на баланс</p></div><div class="act"><button class="btn btn-gold" onclick="buy('coins_10k',50)">50 ⭐</button></div></div>
+<div class="card item"><div class="info"><h3>👑 VIP (x2 доход)</h3><p>Удваивает биржу навсегда</p></div><div class="act"><button class="btn btn-gold" onclick="buy('vip_status',150)">150 ⭐</button></div></div>
+<div class="card item"><div class="info"><h3>🚀 Страховка (5 игр)</h3><p>Возврат 50% при краше</p></div><div class="act"><button class="btn btn-gold" onclick="buy('rocket_shield',75)">75 ⭐</button></div></div>
+</div>
 
-    <!-- НАВИГАЦИЯ -->
-    <div class="nav">
-        <button class="nav-btn active" onclick="switchTab('crash', this)"><span class="nav-icon">🚀</span>Краш</button>
-        <button class="nav-btn" onclick="switchTab('market', this)"><span class="nav-icon">📈</span>Биржа</button>
-        <button class="nav-btn" onclick="switchTab('tasks', this)"><span class="nav-icon">🎯</span>Задания</button>
-        <button class="nav-btn" onclick="switchTab('shop', this)"><span class="nav-icon">⭐</span>Магазин</button>
-    </div>
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        if (tg.initDataUnsafe?.user?.first_name) {
-            document.getElementById('user-name').innerText = tg.initDataUnsafe.user.first_name;
-        }
+<div class="nav">
+<button class="nbtn active" onclick="go('crash',this)"><span>🚀</span>Краш</button>
+<button class="nbtn" onclick="go('market',this)"><span>📈</span>Биржа</button>
+<button class="nbtn" onclick="go('tasks',this)"><span>🎯</span>Задания</button>
+<button class="nbtn" onclick="go('shop',this)"><span>⭐</span>Магазин</button>
+</div>
 
-        // Состояние игры (сохраняется в память телефона)
-        let state = JSON.parse(localStorage.getItem('empire_v2')) || {
-            balance: 1000,
-            income: 0,
-            vip: false,
-            players: [
-                { id: 1, name: "Новичок Алекс", price: 250, profit: 2, owned: 0 },
-                { id: 2, name: "Трейдер Макс", price: 1200, profit: 12, owned: 0 },
-                { id: 3, name: "Кит Крипто", price: 5000, profit: 60, owned: 0 },
-                { id: 4, name: "Магнат Илон", price: 25000, profit: 350, owned: 0 }
-            ],
-            completedTasks: []
-        };
-
-        const tasksData = [
-            { id: 't1', title: 'Подписка на Канал Новостей', reward: 500, url: 'https://t.me' },
-            { id: 't2', title: 'Вступить в Чат Игроков', reward: 750, url: 'https://t.me' },
-            { id: 't3', title: 'Спонсор: Крипто-Блог', reward: 1000, url: 'https://t.me' }
-        ];
-
-        function saveState() {
-            localStorage.setItem('empire_v2', JSON.stringify(state));
-            document.getElementById('balance').innerText = Math.floor(state.balance);
-            const totalProfit = state.income * (state.vip ? 2 : 1);
-            document.getElementById('passive-income').innerText = totalProfit;
-        }
-
-        // Пассивный доход каждую секунду
-        setInterval(() => {
-            if (state.income > 0) {
-                state.balance += state.income * (state.vip ? 2 : 1);
-                saveState();
-            }
-        }, 1000);
-
-        // Переключение вкладок
-        function switchTab(tabId, btn) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById('tab-' + tabId).classList.add('active');
-            btn.classList.add('active');
-            if (tabId === 'market') renderMarket();
-            if (tabId === 'tasks') renderTasks();
-        }
-
-        // --- ЛОГИКА КОСМО-КРАШ ---
-        let isFlying = false, mult = 1.0, crashPoint = 1.0, currentBet = 0, animId;
-        const canvas = document.getElementById('crash-canvas');
-        const ctx = canvas.getContext('2d');
-
-        function doubleBet() {
-            const inp = document.getElementById('bet-amount');
-            inp.value = Math.min(Math.floor(state.balance), (parseInt(inp.value) || 10) * 2);
-        }
-
-        function handleCrashAction() {
-            const btn = document.getElementById('crash-btn');
-            const display = document.getElementById('mult-display');
-            
-            if (!isFlying) {
-                currentBet = parseInt(document.getElementById('bet-amount').value);
-                if (isNaN(currentBet) || currentBet < 10 || currentBet > state.balance) {
-                    tg.showAlert('Недостаточно монет или неверная ставка!');
-                    return;
-                }
-                state.balance -= currentBet;
-                saveState();
-                
-                isFlying = true;
-                mult = 1.00;
-                // Генерация точки краша (шанс мгновенного слива + случайный рост)
-                crashPoint = Math.random() < 0.15 ? 1.05 : (1 + Math.random() * 4.5 + (Math.random() < 0.2 ? Math.random() * 10 : 0));
-                
-                display.style.color = '#fff';
-                btn.className = 'btn btn-gold';
-                btn.innerText = `ЗАБРАТЬ (${currentBet} 🪙)`;
-                flyLoop();
-            } else {
-                // Игрок забрал выигрыш
-                cancelAnimationFrame(animId);
-                isFlying = false;
-                const win = Math.floor(currentBet * mult);
-                state.balance += win;
-                saveState();
-                display.style.color = 'var(--green)';
-                btn.className = 'btn btn-green';
-                btn.innerText = `ПОБЕДА +${win} 🪙 (Играть еще)`;
-            }
-        }
-
-        function flyLoop() {
-            mult += 0.012 + (mult * 0.005);
-            const display = document.getElementById('mult-display');
-            const btn = document.getElementById('crash-btn');
-            
-            display.innerText = mult.toFixed(2) + 'x';
-            btn.innerText = `ЗАБРАТЬ (${Math.floor(currentBet * mult)} 🪙)`;
-            drawRocket(mult);
-
-            if (mult >= crashPoint) {
-                isFlying = false;
-                display.innerText = `💥 ${crashPoint.toFixed(2)}x`;
-                display.style.color = 'var(--red)';
-                btn.className = 'btn btn-red';
-                btn.innerText = 'ВЗРЫВ! Попробовать снова';
-                return;
-            }
-            animId = requestAnimationFrame(flyLoop);
-        }
-
-        function drawRocket(m) {
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const progress = Math.min((m - 1) / 5, 1);
-            const x = 30 + progress * (canvas.width - 70);
-            const y = canvas.height - 30 - progress * (canvas.height - 70);
-            
-            ctx.strokeStyle = '#f59e0b';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.moveTo(20, canvas.height - 20);
-            ctx.quadraticCurveTo(x / 2, canvas.height - 20, x, y);
-            ctx.stroke();
-
-            ctx.font = '28px Arial';
-            ctx.fillText('🚀', x - 14, y + 10);
-        }
-
-        // --- ЛОГИКА БИРЖИ ---
-        function renderMarket() {
-            const list = document.getElementById('market-list');
-            list.innerHTML = state.players.map((p, idx) => `
-                <div class="card item-row">
-                    <div class="item-info">
-                        <h3>${p.name} (Ур. ${p.owned})</h3>
-                        <p>Доход: +${p.profit}/сек | Цена: ${p.price} 🪙</p>
-                    </div>
-                    <div class="item-action">
-                        <button class="btn btn-green" onclick="buyPlayer(${idx})">Купить</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function buyPlayer(idx) {
-            const p = state.players[idx];
-            if (state.balance >= p.price) {
-                state.balance -= p.price;
-                p.owned += 1;
-                state.income += p.profit;
-                p.price = Math.floor(p.price * 1.35);
-                saveState();
-                renderMarket();
-            } else {
-                tg.showAlert('Не хватает монет для покупки игрока!');
-            }
-        }
-
-        // --- ЛОГИКА ЗАДАНИЙ ---
-        function renderTasks() {
-            const list = document.getElementById('tasks-list');
-            list.innerHTML = tasksData.map(t => {
-                const done = state.completedTasks.includes(t.id);
-                return `
-                <div class="card item-row">
-                    <div class="item-info">
-                        <h3>${t.title}</h3>
-                        <p>Награда: +${t.reward} 🪙</p>
-                    </div>
-                    <div class="item-action">
-                        <button class="btn ${done ? 'btn-green' : 'btn-blue'}" ${done ? 'disabled' : ''} onclick="doTask('${t.id}', '${t.url}', ${t.reward})">
-                            ${done ? 'Готово ✓' : 'Выполнить'}
-                        </button>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        function doTask(id, url, reward) {
-            tg.openTelegramLink(url);
-            setTimeout(() => {
-                if (!state.completedTasks.includes(id)) {
-                    state.completedTasks.push(id);
-                    state.balance += reward;
-                    saveState();
-                    renderTasks();
-                    tg.showAlert(`Начислено +${reward} монет!`);
-                }
-            }, 3000);
-        }
-
-        // --- ОПЛАТА STARS (Отправка данных боту) ---
-        function buyStarsItem(itemId, starsPrice) {
-            const payload = JSON.stringify({ action: 'buy_stars', item: itemId, stars: starsPrice });
-            if (tg.initData) {
-                tg.sendData(payload); // Отправляет данные в bot.py и закрывает окно для выставления счета
-            } else {
-                tg.showAlert(`Запрос на оплату ${starsPrice} Stars (${itemId}) отправлен боту!`);
-            }
-        }
-
-        saveState();
-    </script>
+<script>
+const tg=window.Telegram.WebApp;tg.expand();
+if(tg.initDataUnsafe?.user?.first_name)document.getElementById("uname").innerText=tg.initDataUnsafe.user.first_name;
+let st=JSON.parse(localStorage.getItem("emp2"))||{bal:1000,inc:0,vip:!1,pl:[{n:"Новичок Алекс",p:250,r:2,o:0},{n:"Трейдер Макс",p:1200,r:12,o:0},{n:"Кит Крипто",p:5000,r:60,o:0},{n:"Магнат Илон",p:25000,r:350,o:0}],done:[]};
+const tsk=[{id:"t1",t:"Канал Новостей",r:500,u:"https://t.me"},{id:"t2",t:"Чат Игроков",r:750,u:"https://t.me"}];
+function save(){localStorage.setItem("emp2",JSON.stringify(st));document.getElementById("bal").innerText=Math.floor(st.bal);document.getElementById("inc").innerText=st.inc*(st.vip?2:1)}
+setInterval(()=>{if(st.inc>0){st.bal+=st.inc*(st.vip?2:1);save()}},1e3);
+function go(id,b){document.querySelectorAll(".tab").forEach(e=>e.classList.remove("active"));document.querySelectorAll(".nbtn").forEach(e=>e.classList.remove("active"));document.getElementById("t-"+id).classList.add("active");b.classList.add("active");if(id==="market")rM();if(id==="tasks")rT()}
+let fly=!1,m=1,cp=1,cb=0,aid;const cv=document.getElementById("cv"),ctx=cv.getContext("2d");
+function x2(){const i=document.getElementById("bet");i.value=Math.min(Math.floor(st.bal),2*(parseInt(i.value)||10))}
+function play(){const b=document.getElementById("cbtn"),d=document.getElementById("md");if(!fly){cb=parseInt(document.getElementById("bet").value);if(isNaN(cb)||cb<10||cb>st.bal)return alert("Неверная ставка!");st.bal-=cb;save();fly=!0;m=1;cp=Math.random()<.15?1.05:1+4.5*Math.random()+(Math.random()<.2?8*Math.random():0);d.style.color="#fff";b.className="btn btn-gold";b.innerText="ЗАБРАТЬ ("+cb+")";loop()}else{cancelAnimationFrame(aid);fly=!1;const w=Math.floor(cb*m);st.bal+=w;save();d.style.color="var(--green)";b.className="btn btn-green";b.innerText="ПОБЕДА +"+w+" (Еще)"}}
+function loop(){m+=.012+.005*m;const d=document.getElementById("md"),b=document.getElementById("cbtn");d.innerText=m.toFixed(2)+"x";b.innerText="ЗАБРАТЬ ("+Math.floor(cb*m)+")";draw(m);if(m>=cp){fly=!1;d.innerText="💥 "+cp.toFixed(2)+"x";d.style.color="var(--red)";b.className="btn btn-red";b.innerText="ВЗРЫВ! Еще раз";return}aid=requestAnimationFrame(loop)}
+function draw(k){cv.width=cv.offsetWidth;cv.height=cv.offsetHeight;ctx.clearRect(0,0,cv.width,cv.height);const p=Math.min((k-1)/5,1),x=30+p*(cv.width-70),y=cv.height-30-p*(cv.height-70);ctx.strokeStyle="#f59e0b";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(20,cv.height-20);ctx.quadraticCurveTo(x/2,cv.height-20,x,y);ctx.stroke();ctx.font="28px Arial";ctx.fillText("🚀",x-14,y+10)}
+function rM(){document.getElementById("mlist").innerHTML=st.pl.map((p,i)=>`<div class="card item"><div class="info"><h3>${p.n} (Ур.${p.o})</h3><p>+${p.r}/сек | ${p.p} 🪙</p></div><div class="act"><button class="btn btn-green" onclick="bP(${i})">Купить</button></div></div>`).join("")}
+function bP(i){const p=st.pl[i];if(st.bal>=p.p){st.bal-=p.p;p.o++;st.inc+=p.r;p.p=Math.floor(1.35*p.p);save();rM()}else alert("Мало монет!")}
+function rT(){document.getElementById("tlist").innerHTML=tsk.map(t=>{const d=st.done.includes(t.id);return`<div class="card item"><div class="info"><h3>${t.t}</h3><p>+${t.r} 🪙</p></div><div class="act"><button class="btn ${d?"btn-green":"btn-blue"}" ${d?"disabled":""} onclick="dT('${t.id}','${t.u}',${t.r})">${d?"Готово":"Выполнить"}</button></div></div>`}).join("")}
+function dT(id,u,r){if(tg.openTelegramLink)tg.openTelegramLink(u);else window.open(u);setTimeout(()=>{if(!st.done.includes(id)){st.done.push(id);st.bal+=r;save();rT();alert("+"+r+" монет!")}},2500)}
+function buy(it,s){const p=JSON.stringify({action:"buy_stars",item:it,stars:s});if(tg.initData)tg.sendData(p);else alert("Запрос Stars: "+s)}
+save();
+</script>
 </body>
 </html>
