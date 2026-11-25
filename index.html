@@ -98,7 +98,18 @@ xd.style.color="#10b981";btn.className="g";btn.innerText="ПОБЕДА +"+w+" (�
 
 function buyP(i){if(bal>=pl[i].p){bal-=pl[i].p;pl[i].o++;inc+=pl[i].r;pl[i].p=Math.floor(pl[i].p*1.35);upd();sw(2,document.querySelectorAll(".nav button")[1]);}}
 function doZ(i){window.open(z[i].u);setTimeout(()=>{if(!z[i].d){z[i].d=true;bal+=z[i].r;upd();sw(3,document.querySelectorAll(".nav button")[2]);}},2000);}
-function pay(it,s){if(window.Telegram?.WebApp?.initData)window.Telegram.WebApp.sendData(JSON.stringify({action:"buy_stars",item:it,stars:s}));else alert("Счет Stars: "+s);}
+const inv={coins_10k:"https://t.me/$iYwwFOEYOegHAAAANLuQ_8DT3CM",vip_status:"https://t.me/$R8m9ROEYOEgoHAAAWmJE88L16ww",rocket_shield:"https://t.me/$Xwt90EEYOEgpHAAAznYSv8LXk_k"};
+function pay(it,s){
+  if(window.Telegram?.WebApp?.openInvoice && inv[it]){
+    window.Telegram.WebApp.openInvoice(inv[it], function(st){
+      if(st==="paid"){
+        if(it==="coins_10k"){bal+=10000;upd();alert("✅ +10,000 монет зачислено!");}
+        if(it==="vip_status"){vip=true;upd();alert("👑 VIP-Статус активирован!");}
+        if(it==="rocket_shield"){alert("🚀 Страховка на 5 игр активирована!");}
+      }
+    });
+  } else { alert("Откройте игру внутри Telegram!"); }
+}
 </script>
 </body>
 </html>
