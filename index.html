@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Империя Друзей</title>
+<script src="https://telegram.org"></script>
+<style>
+  :root { --bg: #0f111a; --card: #1a1d2d; --accent: #f59e0b; --accent2: #8b5cf6; --text: #ffffff; --sub: #94a3b8; }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; user-select: none; }
+  body { background: var(--bg); color: var(--text); padding-bottom: 80px; overflow-x: hidden; }
+  .header { padding: 16px; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(180deg, #1e1b4b 0%, var(--bg) 100%); }
+  .user-info { display: flex; align-items: center; gap: 10px; }
+  .avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--accent2); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; }
+  .balance-box { background: rgba(245, 158, 11, 0.15); border: 1px solid var(--accent); padding: 6px 14px; border-radius: 20px; font-weight: 700; color: var(--accent); }
+  .page { display: none; padding: 16px; animation: fadeIn 0.2s; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+  .card { background: var(--card); border-radius: 16px; padding: 16px; margin-bottom: 14px; border: 1px solid rgba(255,255,255,0.06); }
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+  .stat-item { background: rgba(255,255,255,0.04); padding: 12px; border-radius: 12px; text-align: center; }
+  .stat-val { font-size: 20px; font-weight: 800; color: #fff; margin-top: 4px; }
+  .stat-lbl { font-size: 12px; color: var(--sub); }
+  .btn { width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.15s; margin-top: 10px; }
+  .btn:active { transform: scale(0.97); }
+  .btn-gold { background: linear-gradient(90deg, #f59e0b, #d97706); color: #000; }
+  .btn-purple { background: linear-gradient(90deg, #8b5cf6, #6d28d9); color: #fff; }
+  .wheel-wrap { position: relative; width: 240px; height: 240px; margin: 20px auto; }
+  .wheel { width: 100%; height: 100%; border-radius: 50%; border: 6px solid var(--accent); background: conic-gradient(#ef4444 0deg 60deg, #f59e0b 60deg 120deg, #10b981 120deg 180deg, #3b82f6 180deg 240deg, #8b5cf6 240deg 300deg, #ec4899 300deg 360deg); transition: transform 3.5s cubic-bezier(0.17, 0.67, 0.12, 0.99); box-shadow: 0 0 25px rgba(245, 158, 11, 0.3); }
+  .pointer { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 14px solid transparent; border-right: 14px solid transparent; border-top: 24px solid #fff; z-index: 10; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+  .wheel-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 54px; height: 54px; background: var(--bg); border: 4px solid var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; }
+  .list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .list-item:last-child { border-bottom: none; }
+  .buy-btn { background: var(--accent); color: #000; border: none; padding: 8px 14px; border-radius: 10px; font-weight: 700; font-size: 13px; }
+  .nav { position: fixed; bottom: 0; left: 0; right: 0; background: #151824; display: flex; justify-content: space-around; padding: 10px 0 18px; border-top: 1px solid rgba(255,255,255,0.08); }
+  .nav-btn { background: none; border: none; color: var(--sub); font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 600; }
+  .nav-btn.active { color: var(--accent); }
+  .nav-icon { font-size: 20px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="user-info">
+    <div class="avatar" id="u-ava">👑</div>
+    <div>
+      <div style="font-weight: 700; font-size: 15px;" id="u-name">Игрок</div>
+      <div style="font-size: 12px; color: var(--sub);" id="u-income">+10 💰 / мин</div>
+    </div>
+  </div>
+  <div class="balance-box"><span id="u-bal">500</span> 💰</div>
+</div>
+
+<div id="tab-home" class="page active">
+  <div class="card">
+    <h3 style="margin-bottom: 6px;">👑 Твоя Империя</h3>
+    <p style="font-size: 13px; color: var(--sub);">Собирай доход каждую минуту, нанимай друзей и вырывайся в Топ-10 недели за реальными призами!</p>
+    <div class="stat-grid">
+      <div class="stat-item"><div class="stat-lbl">В команде</div><div class="stat-val" id="u-workers">0 чел.</div></div>
+      <div class="stat-item"><div class="stat-lbl">Твоя цена</div><div class="stat-val" id="u-price">100 💰</div></div>
+    </div>
+    <button class="btn btn-gold" onclick="collectBonus()">💰 Собрать пассивный доход</button>
+  </div>
+  <div class="card">
+    <h4 style="margin-bottom: 6px;">📢 Зови друзей из колледжа</h4>
+    <p style="font-size: 13px; color: var(--sub);">За каждого приглашенного друга ты получишь +1 000 💰 сразу на баланс!</p>
+    <button class="btn btn-purple" onclick="inviteFriend()">Пригласить друга (+1000 💰)</button>
+  </div>
+</div>
+
+<div id="tab-wheel" class="page">
+  <div class="card" style="text-align: center;">
+    <h3>🎰 Колесо Фортуны</h3>
+    <p style="font-size: 13px; color: var(--sub); margin-top: 4px;">Испытай удачу! Выигрывай до 25 000 💰 или x2 VIP-статус.</p>
+    <div class="wheel-wrap">
+      <div class="pointer"></div>
+      <div class="wheel" id="wheel"></div>
+      <div class="wheel-center">SPIN</div>
+    </div>
+    <button class="btn btn-gold" id="free-spin-btn" onclick="spinWheel(false)">🎁 Крутить бесплатно</button>
+    <button class="btn btn-purple" onclick="spinWheel(true)">⭐️ VIP-прокрут (15 Stars)</button>
+  </div>
+</div>
+
+<div id="tab-market" class="page">
+  <div class="card">
+    <h3 style="margin-bottom: 10px;">💼 Биржа игроков</h3>
+    <div id="market-list"></div>
+  </div>
+</div>
+
+<div id="tab-top" class="page">
+  <div class="card">
+    <h3 style="margin-bottom: 10px;">🏆 Топ-10 Империи</h3>
+    <p style="font-size: 12px; color: var(--accent); margin-bottom: 10px;">Топ-3 игрока в воскресенье получают подарки в Telegram!</p>
+    <div id="top-list"></div>
+  </div>
+</div>
+
+<div class="nav">
+  <button class="nav-btn active" onclick="switchTab('home', this)"><span class="nav-icon">👑</span>Империя</button>
+  <button class="nav-btn" onclick="switchTab('wheel', this)"><span class="nav-icon">🎰</span>Рулетка</button>
+  <button class="nav-btn" onclick="switchTab('market', this)"><span class="nav-icon">💼</span>Биржа</button>
+  <button class="nav-btn" onclick="switchTab('top', this)"><span class="nav-icon">🏆</span>Топ-10</button>
+</div>
+
+<script>
+  const tg = window.Telegram.WebApp;
+  tg.expand();
+  tg.ready();
+
+  const user = tg.initDataUnsafe?.user || { id: 1, first_name: "Босс" };
+  document.getElementById('u-name').innerText = user.first_name;
+  document.getElementById('u-ava').innerText = user.first_name.charAt(0).toUpperCase();
+
+  let state = JSON.parse(localStorage.getItem('emp_state')) || {
+    bal: 500, income: 10, workers: 0, price: 100, deg: 0,
+    market: [
+      { id: 101, name: "Староста Группы", price: 150, inc: 30 },
+      { id: 102, name: "Алексей (2 курс)", price: 300, inc: 65 },
+      { id: 103, name: "Димон", price: 600, inc: 140 },
+      { id: 104, name: "Куратор", price: 1200, inc: 300 }
+    ]
+  };
+
+  function save() {
+    localStorage.setItem('emp_state', JSON.stringify(state));
+    document.getElementById('u-bal').innerText = state.bal;
+    document.getElementById('u-income').innerText = `+${state.income} 💰 / мин`;
+    document.getElementById('u-workers').innerText = `${state.workers} чел.`;
+    document.getElementById('u-price').innerText = `${state.price} 💰`;
+    renderMarket();
+    renderTop();
+  }
+
+  function switchTab(tab, el) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    el.classList.add('active');
+    if(tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
+  }
+
+  function collectBonus() {
+    state.bal += state.income;
+    if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+    tg.showAlert(`💰 Вы собрали +${state.income} монет!`);
+    save();
+  }
+
+  function inviteFriend() {
+    const botUsername = "empire_friends_play_bot";
+    const url = `https://t.me{botUsername}?start=${user.id}&text=Заходи в Империю Друзей, я тебя уже на бирже нашел!`;
+    tg.openTelegramLink(url);
+  }
+
+  let spinning = false;
+  function spinWheel(isVip) {
+    if (spinning) return;
+    if (isVip) {
+      tg.sendData(JSON.stringify({ action: "buy_vip_spin" }));
+      tg.showAlert("⭐️ Счет на 15 Telegram Stars отправлен в чат с ботом!");
+      return;
+    }
+    spinning = true;
+    const extraDeg = 1440 + Math.floor(Math.random() * 360);
+    state.deg += extraDeg;
+    document.getElementById('wheel').style.transform = `rotate(${state.deg}deg)`;
+    if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('heavy');
+
+    setTimeout(() => {
+      spinning = false;
+      const win = (Math.floor(Math.random() * 15) + 1) * 100;
+      state.bal += win;
+      save();
+      tg.showAlert(`🎉 Поздравляем! Вы выиграли ${win} монет!`);
+    }, 3600);
+  }
+
+  function renderMarket() {
+    const box = document.getElementById('market-list');
+    box.innerHTML = state.market.map((p, idx) => `
+      <div class="list-item">
+        <div>
+          <div style="font-weight: 700;">${p.name}</div>
+  
