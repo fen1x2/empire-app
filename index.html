@@ -6,84 +6,99 @@
 <title>Империя Друзей 2.0</title>
 <script src="https://telegram.org"></script>
 <style>
-:root{--bg:#0f172a;--card:#1e293b;--accent:#f59e0b;--green:#10b981;--red:#ef4444;--text:#f8fafc;--muted:#94a3b8}
-*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,sans-serif;user-select:none}
-body{background:var(--bg);color:var(--text);padding-bottom:80px;overflow-x:hidden}
-.header{display:flex;justify-content:space-between;align-items:center;padding:15px;background:var(--card);border-bottom:1px solid #334155;position:sticky;top:0;z-index:10}
-.balance{font-size:18px;font-weight:700;color:var(--accent)}
-.tab{display:none;padding:15px}.tab.active{display:block}
-.card{background:var(--card);border-radius:12px;padding:15px;margin-bottom:12px;border:1px solid #334155}
-h2{font-size:18px;margin-bottom:12px}
-.btn{width:100%;padding:12px;border:none;border-radius:10px;font-weight:700;font-size:16px;cursor:pointer;color:#fff}
-.btn-gold{background:linear-gradient(45deg,#d97706,#f59e0b);color:#000}
-.btn-green{background:var(--green)}.btn-red{background:var(--red)}.btn-blue{background:#3b82f6}
-.btn:disabled{opacity:.5}
-.crash-box{position:relative;height:200px;background:#020617;border-radius:12px;overflow:hidden;margin-bottom:12px;border:1px solid #334155;display:flex;align-items:center;justify-content:center}
-#cv{position:absolute;top:0;left:0;width:100%;height:100%}
-.mult{position:relative;z-index:2;font-size:42px;font-weight:900;text-shadow:0 0 15px #000}
-.row{display:flex;gap:10px;margin-bottom:10px}
-.inp{width:50%;padding:12px;border-radius:10px;border:1px solid #475569;background:#0f172a;color:#fff;font-size:16px;text-align:center}
+body{background:#0f172a;color:#f8fafc;font-family:sans-serif;margin:0;padding:0 0 75px;user-select:none}
+.top{display:flex;justify-content:space-between;padding:15px;background:#1e293b;border-bottom:1px solid #334155;font-weight:bold}
+.bal{color:#f59e0b}
+.tab{display:none;padding:15px}.tab.on{display:block}
+.box{position:relative;height:200px;background:#020617;border-radius:12px;border:1px solid #334155;display:flex;align-items:center;justify-content:center;margin-bottom:12px;overflow:hidden}
+canvas{position:absolute;top:0;left:0;width:100%;height:100%}
+#x{position:relative;z-index:2;font-size:44px;font-weight:900}
+.card{background:#1e293b;padding:14px;border-radius:12px;margin-bottom:10px;border:1px solid #334155}
+.row{display:flex;gap:8px;margin-bottom:10px}
+input{width:50%;padding:12px;border-radius:8px;border:1px solid #475569;background:#0f172a;color:#fff;font-size:16px;text-align:center}
+button{border:none;border-radius:8px;padding:12px;font-weight:bold;font-size:15px;color:#fff;cursor:pointer;width:100%}
+.g{background:#10b981}.y{background:#f59e0b;color:#000}.r{background:#ef4444}.b{background:#3b82f6}
 .item{display:flex;justify-content:space-between;align-items:center}
-.info h3{font-size:15px;margin-bottom:4px}.info p{font-size:12px;color:var(--muted)}
-.act{width:110px}.act .btn{padding:8px;font-size:13px}
-.nav{position:fixed;bottom:0;left:0;width:100%;background:var(--card);display:flex;border-top:1px solid #334155;z-index:20}
-.nbtn{flex:1;padding:10px 5px;background:0 0;border:none;color:var(--muted);font-size:11px;display:flex;flex-direction:column;align-items:center;gap:4px}
-.nbtn.active{color:var(--accent);font-weight:700}
+.nav{position:fixed;bottom:0;left:0;width:100%;background:#1e293b;display:flex;border-top:1px solid #334155}
+.nav button{background:none;color:#94a3b8;font-size:12px;padding:10px 0;border-radius:0}
+.nav button.on{color:#f59e0b}
 </style>
 </head>
 <body>
-<div class="header"><div>👑 <b id="uname">Император</b></div><div class="balance">🪙 <span id="bal">1000</span></div></div>
+<div class="top"><div>👑 Империя 2.0</div><div class="bal">🪙 <span id="b">1000</span></div></div>
 
-<div id="t-crash" class="tab active">
-<h2>🚀 Космо-Краш</h2>
-<div class="crash-box"><canvas id="cv"></canvas><div class="mult" id="md">1.00x</div></div>
+<div id="t1" class="tab on">
+<div class="box"><canvas id="c"></canvas><div id="x">1.00x</div></div>
 <div class="card">
-<div class="row"><input type="number" id="bet" class="inp" value="100" min="10"><button class="btn btn-blue" style="width:50%" onclick="x2()">x2 Ставка</button></div>
-<button id="cbtn" class="btn btn-green" onclick="play()">ПОЛЕТЕЛИ (Ставка)</button>
+<div class="row"><input id="bet" type="number" value="100"><button class="b" style="width:50%" onclick="dbl()">x2 Ставка</button></div>
+<button id="btn" class="g" onclick="run()">🚀 ПОЛЕТЕЛИ</button>
 </div>
 </div>
 
-<div id="t-market" class="tab">
-<h2>📈 Биржа Игроков</h2>
-<p style="font-size:13px;color:var(--muted);margin-bottom:12px">Доход: <b style="color:var(--green)">+<span id="inc">0</span>/сек</b></p>
-<div id="mlist"></div>
+<div id="t2" class="tab">
+<div class="card">Доход с биржи: <b style="color:#10b981">+<span id="inc">0</span>/сек</b></div>
+<div id="m"></div>
 </div>
 
-<div id="t-tasks" class="tab"><h2>🎯 Задания</h2><div id="tlist"></div></div>
+<div id="t3" class="tab"><div id="z"></div></div>
 
-<div id="t-shop" class="tab">
-<h2>⭐ Магазин Stars</h2>
-<div class="card item"><div class="info"><h3>💰 +10,000 монет</h3><p>Моментально на баланс</p></div><div class="act"><button class="btn btn-gold" onclick="buy('coins_10k',50)">50 ⭐</button></div></div>
-<div class="card item"><div class="info"><h3>👑 VIP (x2 доход)</h3><p>Удваивает биржу навсегда</p></div><div class="act"><button class="btn btn-gold" onclick="buy('vip_status',150)">150 ⭐</button></div></div>
-<div class="card item"><div class="info"><h3>🚀 Страховка (5 игр)</h3><p>Возврат 50% при краше</p></div><div class="act"><button class="btn btn-gold" onclick="buy('rocket_shield',75)">75 ⭐</button></div></div>
+<div id="t4" class="tab">
+<div class="card item"><div><b>💰 +10,000 монет</b><br><small>На баланс</small></div><button class="y" style="width:90px" onclick="pay('coins_10k',50)">50 ⭐</button></div>
+<div class="card item"><div><b>👑 VIP x2 доход</b><br><small>Навсегда</small></div><button class="y" style="width:90px" onclick="pay('vip_status',150)">150 ⭐</button></div>
+<div class="card item"><div><b>🚀 Страховка</b><br><small>5 игр</small></div><button class="y" style="width:90px" onclick="pay('rocket_shield',75)">75 ⭐</button></div>
 </div>
 
 <div class="nav">
-<button class="nbtn active" onclick="go('crash',this)"><span>🚀</span>Краш</button>
-<button class="nbtn" onclick="go('market',this)"><span>📈</span>Биржа</button>
-<button class="nbtn" onclick="go('tasks',this)"><span>🎯</span>Задания</button>
-<button class="nbtn" onclick="go('shop',this)"><span>⭐</span>Магазин</button>
+<button class="on" onclick="sw(1,this)">🚀 Краш</button>
+<button onclick="sw(2,this)">📈 Биржа</button>
+<button onclick="sw(3,this)">🎯 Задания</button>
+<button onclick="sw(4,this)">⭐ Магазин</button>
 </div>
 
 <script>
-const tg=window.Telegram.WebApp;tg.expand();
-if(tg.initDataUnsafe?.user?.first_name)document.getElementById("uname").innerText=tg.initDataUnsafe.user.first_name;
-let st=JSON.parse(localStorage.getItem("emp2"))||{bal:1000,inc:0,vip:!1,pl:[{n:"Новичок Алекс",p:250,r:2,o:0},{n:"Трейдер Макс",p:1200,r:12,o:0},{n:"Кит Крипто",p:5000,r:60,o:0},{n:"Магнат Илон",p:25000,r:350,o:0}],done:[]};
-const tsk=[{id:"t1",t:"Канал Новостей",r:500,u:"https://t.me"},{id:"t2",t:"Чат Игроков",r:750,u:"https://t.me"}];
-function save(){localStorage.setItem("emp2",JSON.stringify(st));document.getElementById("bal").innerText=Math.floor(st.bal);document.getElementById("inc").innerText=st.inc*(st.vip?2:1)}
-setInterval(()=>{if(st.inc>0){st.bal+=st.inc*(st.vip?2:1);save()}},1e3);
-function go(id,b){document.querySelectorAll(".tab").forEach(e=>e.classList.remove("active"));document.querySelectorAll(".nbtn").forEach(e=>e.classList.remove("active"));document.getElementById("t-"+id).classList.add("active");b.classList.add("active");if(id==="market")rM();if(id==="tasks")rT()}
-let fly=!1,m=1,cp=1,cb=0,aid;const cv=document.getElementById("cv"),ctx=cv.getContext("2d");
-function x2(){const i=document.getElementById("bet");i.value=Math.min(Math.floor(st.bal),2*(parseInt(i.value)||10))}
-function play(){const b=document.getElementById("cbtn"),d=document.getElementById("md");if(!fly){cb=parseInt(document.getElementById("bet").value);if(isNaN(cb)||cb<10||cb>st.bal)return alert("Неверная ставка!");st.bal-=cb;save();fly=!0;m=1;cp=Math.random()<.15?1.05:1+4.5*Math.random()+(Math.random()<.2?8*Math.random():0);d.style.color="#fff";b.className="btn btn-gold";b.innerText="ЗАБРАТЬ ("+cb+")";loop()}else{cancelAnimationFrame(aid);fly=!1;const w=Math.floor(cb*m);st.bal+=w;save();d.style.color="var(--green)";b.className="btn btn-green";b.innerText="ПОБЕДА +"+w+" (Еще)"}}
-function loop(){m+=.012+.005*m;const d=document.getElementById("md"),b=document.getElementById("cbtn");d.innerText=m.toFixed(2)+"x";b.innerText="ЗАБРАТЬ ("+Math.floor(cb*m)+")";draw(m);if(m>=cp){fly=!1;d.innerText="💥 "+cp.toFixed(2)+"x";d.style.color="var(--red)";b.className="btn btn-red";b.innerText="ВЗРЫВ! Еще раз";return}aid=requestAnimationFrame(loop)}
-function draw(k){cv.width=cv.offsetWidth;cv.height=cv.offsetHeight;ctx.clearRect(0,0,cv.width,cv.height);const p=Math.min((k-1)/5,1),x=30+p*(cv.width-70),y=cv.height-30-p*(cv.height-70);ctx.strokeStyle="#f59e0b";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(20,cv.height-20);ctx.quadraticCurveTo(x/2,cv.height-20,x,y);ctx.stroke();ctx.font="28px Arial";ctx.fillText("🚀",x-14,y+10)}
-function rM(){document.getElementById("mlist").innerHTML=st.pl.map((p,i)=>`<div class="card item"><div class="info"><h3>${p.n} (Ур.${p.o})</h3><p>+${p.r}/сек | ${p.p} 🪙</p></div><div class="act"><button class="btn btn-green" onclick="bP(${i})">Купить</button></div></div>`).join("")}
-function bP(i){const p=st.pl[i];if(st.bal>=p.p){st.bal-=p.p;p.o++;st.inc+=p.r;p.p=Math.floor(1.35*p.p);save();rM()}else alert("Мало монет!")}
-function rT(){document.getElementById("tlist").innerHTML=tsk.map(t=>{const d=st.done.includes(t.id);return`<div class="card item"><div class="info"><h3>${t.t}</h3><p>+${t.r} 🪙</p></div><div class="act"><button class="btn ${d?"btn-green":"btn-blue"}" ${d?"disabled":""} onclick="dT('${t.id}','${t.u}',${t.r})">${d?"Готово":"Выполнить"}</button></div></div>`}).join("")}
-function dT(id,u,r){if(tg.openTelegramLink)tg.openTelegramLink(u);else window.open(u);setTimeout(()=>{if(!st.done.includes(id)){st.done.push(id);st.bal+=r;save();rT();alert("+"+r+" монет!")}},2500)}
-function buy(it,s){const p=JSON.stringify({action:"buy_stars",item:it,stars:s});if(tg.initData)tg.sendData(p);else alert("Запрос Stars: "+s)}
-save();
+let bal=1000,inc=0,vip=false,fly=false,m=1,cp=1,cb=0,tm;
+const pl=[{n:"Новичок",p:250,r:2,o:0},{n:"Трейдер",p:1200,r:12,o:0},{n:"Кит",p:5000,r:60,o:0}];
+const z=[{n:"Канал Новостей",r:500,u:"https://t.me",d:false},{n:"Чат Игроков",r:750,u:"https://t.me",d:false}];
+const cv=document.getElementById("c"),ctx=cv.getContext("2d");
+
+function upd(){document.getElementById("b").innerText=Math.floor(bal);document.getElementById("inc").innerText=inc*(vip?2:1);}
+setInterval(()=>{if(inc>0){bal+=inc*(vip?2:1);upd();}},1000);
+
+function sw(n,el){
+document.querySelectorAll(".tab").forEach(e=>e.classList.remove("on"));
+document.querySelectorAll(".nav button").forEach(e=>e.classList.remove("on"));
+document.getElementById("t"+n).classList.add("on");el.classList.add("on");
+if(n===2)document.getElementById("m").innerHTML=pl.map((p,i)=>`<div class="card item"><div><b>${p.n} (Ур.${p.o})</b><br><small>+${p.r}/сек | ${p.p} 🪙</small></div><button class="g" style="width:90px" onclick="buyP(${i})">Купить</button></div>`).join("");
+if(n===3)document.getElementById("z").innerHTML=z.map((t,i)=>`<div class="card item"><div><b>${t.n}</b><br><small>+${t.r} 🪙</small></div><button class="b" style="width:90px" ${t.d?"disabled":""} onclick="doZ(${i})">${t.d?"Готово":"Жми"}</button></div>`).join("");
+}
+
+function dbl(){let i=document.getElementById("bet");i.value=Math.min(Math.floor(bal),(parseInt(i.value)||10)*2);}
+
+function run(){
+let btn=document.getElementById("btn"),xd=document.getElementById("x");
+if(!fly){
+cb=parseInt(document.getElementById("bet").value);
+if(!cb||cb<10||cb>bal)return alert("Мало монет!");
+bal-=cb;upd();fly=true;m=1;
+cp=Math.random()<0.15?1.08:1.2+Math.random()*4;
+xd.style.color="#fff";btn.className="y";btn.innerText="ЗАБРАТЬ "+cb;
+tm=setInterval(()=>{
+m+=0.03;xd.innerText=m.toFixed(2)+"x";btn.innerText="ЗАБРАТЬ "+Math.floor(cb*m);
+cv.width=cv.offsetWidth;cv.height=cv.offsetHeight;ctx.clearRect(0,0,cv.width,cv.height);
+let p=Math.min((m-1)/4,1),px=30+p*(cv.width-70),py=cv.height-30-p*(cv.height-70);
+ctx.strokeStyle="#f59e0b";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(20,cv.height-20);ctx.lineTo(px,py);ctx.stroke();
+ctx.font="30px Arial";ctx.fillText("🚀",px-15,py+10);
+if(m>=cp){clearInterval(tm);fly=false;xd.innerText="💥 "+cp.toFixed(2)+"x";xd.style.color="#ef4444";btn.className="r";btn.innerText="ВЗРЫВ! Еще раз";}
+},50);
+}else{
+clearInterval(tm);fly=false;let w=Math.floor(cb*m);bal+=w;upd();
+xd.style.color="#10b981";btn.className="g";btn.innerText="ПОБЕДА +"+w+" (Еще)";
+}
+}
+
+function buyP(i){if(bal>=pl[i].p){bal-=pl[i].p;pl[i].o++;inc+=pl[i].r;pl[i].p=Math.floor(pl[i].p*1.35);upd();sw(2,document.querySelectorAll(".nav button")[1]);}}
+function doZ(i){window.open(z[i].u);setTimeout(()=>{if(!z[i].d){z[i].d=true;bal+=z[i].r;upd();sw(3,document.querySelectorAll(".nav button")[2]);}},2000);}
+function pay(it,s){if(window.Telegram?.WebApp?.initData)window.Telegram.WebApp.sendData(JSON.stringify({action:"buy_stars",item:it,stars:s}));else alert("Счет Stars: "+s);}
 </script>
 </body>
 </html>
