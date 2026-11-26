@@ -4,61 +4,42 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Битва за Стипуху 2.0</title>
-<script src="https://telegram.org"></script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; user-select: none; }
   body { background: #0f0f13; color: #fff; padding-bottom: 80px; overflow-x: hidden; }
-  
   .header { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: #181820; border-bottom: 1px solid #2a2a36; position: sticky; top: 0; z-index: 10; }
   .balance-box { font-size: 20px; font-weight: 800; color: #ffd700; display: flex; align-items: center; gap: 6px; }
   .income-badge { font-size: 12px; background: rgba(76, 175, 80, 0.2); color: #4caf50; padding: 4px 8px; border-radius: 8px; font-weight: 700; }
   .shield-badge { font-size: 12px; background: rgba(0, 229, 255, 0.2); color: #00e5ff; padding: 4px 8px; border-radius: 8px; font-weight: 700; display: none; }
-
-  .tab { display: none; padding: 16px; animation: fadeIn 0.2s ease; }
+  .tab { display: none; padding: 16px; }
   .tab.active { display: block; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-
-  .boss-card { background: linear-gradient(145deg, #1e1e28, #14141c); border: 1px solid #2e2e3e; border-radius: 20px; padding: 18px; text-align: center; position: relative; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
-  .boss-title { font-size: 18px; font-weight: 800; color: #ff5252; text-transform: uppercase; letter-spacing: 0.5px; }
+  .boss-card { background: linear-gradient(145deg, #1e1e28, #1414cc); border: 1px solid #2e2e3e; border-radius: 20px; padding: 18px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+  .boss-title { font-size: 18px; font-weight: 800; color: #ff5252; text-transform: uppercase; }
   .boss-sub { font-size: 12px; color: #9e9eb3; margin-top: 2px; }
   .boss-avatar { font-size: 84px; margin: 14px 0; display: inline-block; transition: transform 0.1s; filter: drop-shadow(0 0 15px rgba(255, 82, 82, 0.4)); }
-  
-  .hp-wrap { background: #2a2a38; height: 14px; border-radius: 10px; overflow: hidden; margin: 10px 0 6px; position: relative; }
+  .hp-wrap { background: #2a2a38; height: 14px; border-radius: 10px; overflow: hidden; margin: 10px 0 6px; }
   .hp-bar { background: linear-gradient(90deg, #ff1744, #ff9100); height: 100%; width: 100%; transition: width 0.2s ease; }
   .hp-text { font-size: 12px; font-weight: 700; color: #ccc; }
-
   .mult-display { font-size: 36px; font-weight: 900; margin: 12px 0 4px; color: #fff; text-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
   .battle-log { font-size: 13px; color: #ffab40; min-height: 20px; font-weight: 600; margin-bottom: 12px; }
-
   .bet-controls { display: flex; gap: 8px; margin-bottom: 12px; }
   .bet-input { flex: 1; background: #22222e; border: 1px solid #38384a; color: #fff; font-size: 16px; font-weight: 700; padding: 12px; border-radius: 12px; text-align: center; }
   .bet-btn-small { background: #2a2a38; border: none; color: #fff; font-weight: 700; padding: 0 14px; border-radius: 12px; cursor: pointer; }
-  
-  .action-btn { width: 100%; padding: 16px; border: none; border-radius: 14px; font-size: 17px; font-weight: 800; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; transition: transform 0.1s; }
-  .action-btn:active { transform: scale(0.97); }
-  .btn-attack { background: linear-gradient(90deg, #ff3d00, #ff9100); color: #fff; box-shadow: 0 4px 15px rgba(255, 61, 0, 0.4); }
-  .btn-cashout { background: linear-gradient(90deg, #00c853, #64dd17); color: #000; box-shadow: 0 4px 15px rgba(0, 200, 83, 0.4); }
-
-  @keyframes shake {
-    0%, 100% { transform: translate(0, 0) rotate(0deg); }
-    20% { transform: translate(-6px, 4px) rotate(-3deg); }
-    40% { transform: translate(6px, -4px) rotate(3deg); }
-    60% { transform: translate(-5px, -3px) rotate(-2deg); }
-    80% { transform: translate(5px, 3px) rotate(2deg); }
-  }
+  .action-btn { width: 100%; padding: 16px; border: none; border-radius: 14px; font-size: 17px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
+  .btn-attack { background: linear-gradient(90deg, #ff3d00, #ff9100); color: #fff; }
+  .btn-cashout { background: linear-gradient(90deg, #00c853, #64dd17); color: #000; }
+  @keyframes shake { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 25% { transform: translate(-6px, 4px) rotate(-3deg); } 50% { transform: translate(6px, -4px) rotate(3deg); } 75% { transform: translate(-5px, -3px) rotate(-2deg); } }
   .shake { animation: shake 0.35s ease; }
-
   .card { background: #181822; border: 1px solid #282836; border-radius: 14px; padding: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
   .card-info h4 { font-size: 15px; margin-bottom: 4px; }
   .card-info p { font-size: 12px; color: #9a9ab0; }
-  .buy-btn { background: #2979ff; color: #fff; border: none; padding: 10px 14px; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; white-space: nowrap; }
+  .buy-btn { background: #2979ff; color: #fff; border: none; padding: 10px 14px; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; }
   .buy-btn:disabled { background: #333; color: #777; }
   .star-btn { background: linear-gradient(45deg, #ffab00, #ff6d00); color: #000; }
-
   .ref-box { background: #181822; border: 1px solid #2e2e3e; border-radius: 16px; padding: 16px; margin: 14px 0; text-align: center; }
   .ref-stat { font-size: 15px; margin: 8px 0; }
   .ref-stat b { color: #ffd700; font-size: 18px; }
-
   .nav { position: fixed; bottom: 0; left: 0; right: 0; background: #14141c; border-top: 1px solid #262633; display: flex; justify-content: space-around; padding: 8px 4px; z-index: 20; }
   .nav-btn { background: none; border: none; color: #7a7a90; font-size: 11px; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; flex: 1; }
   .nav-btn span { font-size: 18px; }
@@ -66,148 +47,46 @@
 </style>
 </head>
 <body>
-
-<div class="header">
-  <div class="balance-box">🪙 <span id="balance">1000</span></div>
-  <div style="display:flex; gap:6px; align-items:center;">
-    <div id="shield-badge" class="shield-badge">🛡️ <span id="shields">0</span></div>
-    <div class="income-badge">+<span id="income">0</span>/сек</div>
-  </div>
-</div>
-
-<div id="tab-arena" class="tab active">
-  <div class="boss-card" id="boss-card">
-    <div class="boss-title" id="boss-name">Одногруппник-должник</div>
-    <div class="boss-sub" id="boss-desc">Просит сотку до стипухи</div>
-    <div class="boss-avatar" id="boss-avatar">🤓</div>
-    
-    <div class="hp-wrap">
-      <div class="hp-bar" id="hp-bar"></div>
-    </div>
-    <div class="hp-text">HP Босса: <span id="boss-hp">500</span> / <span id="boss-max-hp">500</span> | Куш: <span id="boss-reward">1500</span> 🪙</div>
-
-    <div class="mult-display" id="mult-display">1.00x</div>
-    <div class="battle-log" id="battle-log">Сделай ставку и наедь на босса!</div>
-
-    <div class="bet-controls" id="bet-controls">
-      <button class="bet-btn-small" onclick="changeBet(0.5)">½</button>
-      <input type="number" id="bet-input" class="bet-input" value="100" min="10">
-      <button class="bet-btn-small" onclick="changeBet(2)">x2</button>
-    </div>
-
-    <button id="main-battle-btn" class="action-btn btn-attack" onclick="handleBattleBtn()">👊 НАЕХАТЬ</button>
-  </div>
-</div>
-
-<div id="tab-farm" class="tab">
-  <h3 style="margin-bottom:12px;">📈 Студенческие темки</h3>
-  <div id="farm-list"></div>
-</div>
-
-<div id="tab-friends" class="tab">
-  <h3 style="text-align:center;">👥 Позвать одногруппников</h3>
-  <p style="text-align:center; color:#9a9ab0; font-size:13px; margin-top:6px;">
-    За каждого одногруппника получай <b>+500 🪙</b> сразу и <b>+10%</b> ко всем темкам!
-  </p>
-  <div class="ref-box">
-    <div class="ref-stat">В твоей банде: <b id="ref-count">0</b> чел.</div>
-    <div class="ref-stat">Бонус с банды: <b id="ref-bonus">0</b> 🪙</div>
-    <div class="ref-stat">Буст к темкам: <b style="color:#4caf50;">+<span id="ref-boost">0</span>%</b></div>
-  </div>
-  <button class="action-btn btn-attack" onclick="inviteFriend()">📢 ПОЗВАТЬ В ЧАТ ГРУППЫ</button>
-</div>
-
-<div id="tab-tasks" class="tab">
-  <h3 style="margin-bottom:12px;">🎯 Халява на стипуху</h3>
-  <div id="tasks-list"></div>
-</div>
-
-<div id="tab-shop" class="tab">
-  <h3 style="margin-bottom:12px;">⭐ Студенческий Буфет</h3>
-  
-  <div class="card">
-    <div class="card-info">
-      <h4>👵 Бабушкин перевод</h4>
-      <p>+10,000 монет на баланс сразу</p>
-    </div>
-    <button class="buy-btn star-btn" onclick="buyStars('coins')">50 ⭐</button>
-  </div>
-
-  <div class="card">
-    <div class="card-info">
-      <h4>🎓 Повышенная стипендия (VIP)</h4>
-      <p>Доход от всех темок x2 навсегда</p>
-    </div>
-    <button id="vip-btn" class="buy-btn star-btn" onclick="buyStars('vip')">150 ⭐</button>
-  </div>
-
-  <div class="card">
-    <div class="card-info">
-      <h4>🏥 Справка от врача (5 шт.)</h4>
-      <p>Спасает ставку, если Босс тебя завалил</p>
-    </div>
-    <button class="buy-btn star-btn" onclick="buyStars('shield')">75 ⭐</button>
-  </div>
-</div>
-
-<div class="nav">
-  <button class="nav-btn active" onclick="switchTab('arena', this)"><span>⚔️</span>Арена</button>
-  <button class="nav-btn" onclick="switchTab('farm', this)"><span>📈</span>Темки</button>
-  <button class="nav-btn" onclick="switchTab('friends', this)"><span>👥</span>Банда</button>
-  <button class="nav-btn" onclick="switchTab('tasks', this)"><span>🎯</span>Халява</button>
-  <button class="nav-btn" onclick="switchTab('shop', this)"><span>⭐</span>Буфет</button>
-</div>
-
+<div class="header"><div class="balance-box">🪙 <span id="balance">1000</span></div><div style="display:flex;gap:6px"><div id="shield-badge" class="shield-badge">🛡️ <span id="shields">0</span></div><div class="income-badge">+<span id="income">0</span>/сек</div></div></div>
+<div id="tab-arena" class="tab active"><div class="boss-card" id="boss-card"><div class="boss-title" id="boss-name"></div><div class="boss-sub" id="boss-desc"></div><div class="boss-avatar" id="boss-avatar"></div><div class="hp-wrap"><div class="hp-bar" id="hp-bar"></div></div><div class="hp-text">HP: <span id="boss-hp"></span> / <span id="boss-max-hp"></span> | Куш: <span id="boss-reward"></span> 🪙</div><div class="mult-display" id="mult-display">1.00x</div><div class="battle-log" id="battle-log">Сделай ставку и наедь!</div><div class="bet-controls"><button class="bet-btn-small" onclick="changeBet(0.5)">½</button><input type="number" id="bet-input" class="bet-input" value="100"><button class="bet-btn-small" onclick="changeBet(2)">x2</button></div><button id="main-battle-btn" class="action-btn btn-attack" onclick="handleBattleBtn()">👊 НАЕХАТЬ</button></div></div>
+<div id="tab-farm" class="tab"><div id="farm-list"></div></div>
+<div id="tab-friends" class="tab"><div class="ref-box"><div class="ref-stat">Банда: <b id="ref-count">0</b></div><div class="ref-stat">Бонус: <b id="ref-bonus">0</b> 🪙</div><div class="ref-stat">Буст: +<b id="ref-boost">0</b>%</div></div><button class="action-btn btn-attack" onclick="inviteFriend()">📢 ПОЗВАТЬ В ЧАТ</button></div>
+<div id="tab-tasks" class="tab"><div id="tasks-list"></div></div>
+<div id="tab-shop" class="tab"><div class="card"><div class="card-info"><h4>👵 Перевод</h4><p>+10,000 🪙</p></div><button class="buy-btn star-btn" onclick="buyStars('coins')">50 ⭐</button></div><div class="card"><div class="card-info"><h4>🎓 VIP x2</h4><p>Доход x2</p></div><button id="vip-btn" class="buy-btn star-btn" onclick="buyStars('vip')">150 ⭐</button></div><div class="card"><div class="card-info"><h4>🏥 Справка</h4><p>5 шт.</p></div><button class="buy-btn star-btn" onclick="buyStars('shield')">75 ⭐</button></div></div>
+<div class="nav"><button class="nav-btn active" onclick="switchTab('arena',this)"><span>⚔️</span>Арена</button><button class="nav-btn" onclick="switchTab('farm',this)"><span>📈</span>Темки</button><button class="nav-btn" onclick="switchTab('friends',this)"><span>👥</span>Банда</button><button class="nav-btn" onclick="switchTab('tasks',this)"><span>🎯</span>Халява</button><button class="nav-btn" onclick="switchTab('shop',this)"><span>⭐</span>Буфет</button></div>
 <script>
 const tg = window.Telegram?.WebApp;
 if (tg) { tg.expand(); tg.ready(); }
-
-const INVOICE_COINS  = "https://t.me";
-const INVOICE_VIP    = "https://t.me";
+const INVOICE_COINS = "https://t.me";
+const INVOICE_VIP = "https://t.me";
 const INVOICE_SHIELD = "https://t.me";
-
 const urlParams = new URLSearchParams(window.location.search);
 const uid = urlParams.get("uid") || (tg?.initDataUnsafe?.user?.id || "0");
 const refsCount = parseInt(urlParams.get("refs")) || 0;
 const refBonus = parseInt(urlParams.get("rbonus")) || 0;
-
-let state = JSON.parse(localStorage.getItem("stipend_save")) || {
-  balance: 1000, bossIdx: 0, bossHp: 500, vip: false, shields: 0, claimedRef: 0,
-  upgrades: {0: 0, 1: 0, 2: 0, 3: 0}, tasksDone: {}
-};
-
-if (refBonus > state.claimedRef) {
-  state.balance += (refBonus - state.claimedRef);
-  state.claimedRef = refBonus;
-}
-
+let state = JSON.parse(localStorage.getItem("stipend_save")) || { balance: 1000, bossIdx: 0, bossHp: 500, vip: false, shields: 0, claimedRef: 0, upgrades: {0:0,1:0,2:0,3:0}, tasksDone: {} };
+if (refBonus > state.claimedRef) { state.balance += (refBonus - state.claimedRef); state.claimedRef = refBonus; }
 const BOSSES = [
   { name: "Одногруппник-должник", desc: "Просит сотку до стипухи", avatar: "🤓", maxHp: 500, reward: 1500 },
   { name: "Злая Вахтёрша", desc: "Не пускает в общагу после 23:00", avatar: "👵", maxHp: 2000, reward: 5000 },
   { name: "СТРАШНЫЙ КФС-БОСС", desc: "Охраняет острые крылышки и стипендию", avatar: "🍗", maxHp: 6000, reward: 18000 },
   { name: "Декан на пересдаче", desc: "Финальный босс сессии", avatar: "👨‍🏫", maxHp: 20000, reward: 75000 }
 ];
-
 const UPGRADES = [
   { name: "📝 Списывание на паре", baseCost: 150, income: 3 },
   { name: "📚 Перепродажа шпор", baseCost: 600, income: 14 },
   { name: "🌯 Шаурмечная у общаги", baseCost: 2500, income: 65 },
   { name: "💻 Курсачи на заказ", baseCost: 10000, income: 280 }
 ];
-
 const TASKS = [
   { id: "tg_chan", title: "Подписаться на канал общаги", reward: 1000, url: "https://t.me" },
   { id: "share_3", title: "Рассказать о КФС-Боссе друзьям", reward: 1500, url: "https://t.me" }
 ];
-
 function save() { localStorage.setItem("stipend_save", JSON.stringify(state)); }
-
 function getIncomePerSec() {
-  let base = 0;
-  UPGRADES.forEach((u, i) => base += (state.upgrades[i] || 0) * u.income);
+  let base = 0; UPGRADES.forEach((u, i) => base += (state.upgrades[i] || 0) * u.income);
   return Math.floor(base * (state.vip ? 2 : 1) * (1 + refsCount * 0.10));
 }
-
 function updateUI() {
   document.getElementById("balance").innerText = Math.floor(state.balance);
   document.getElementById("income").innerText = getIncomePerSec();
@@ -227,140 +106,80 @@ function updateUI() {
   if (state.vip) { const vb = document.getElementById("vip-btn"); vb.innerText = "Активно ✅"; vb.disabled = true; }
   renderFarm(); renderTasks(); save();
 }
-
 let inBattle = false, currentBet = 0, currentMult = 1.0, crashPoint = 1.0, battleTimer = null;
-
-function changeBet(f) {
-  if (inBattle) return;
-  const inp = document.getElementById("bet-input");
-  inp.value = Math.min(Math.max(10, Math.floor((parseInt(inp.value) || 100) * f)), Math.floor(state.balance));
-}
-
+function changeBet(f) { if (!inBattle) { const i = document.getElementById("bet-input"); i.value = Math.min(Math.max(10, Math.floor((parseInt(i.value)||100)*f)), Math.floor(state.balance)); } }
 function handleBattleBtn() { if (!inBattle) startBattle(); else cashoutBattle(); }
-
 function startBattle() {
   const bet = parseInt(document.getElementById("bet-input").value);
-  if (!bet || bet <= 0 || bet > state.balance) {
-    document.getElementById("battle-log").innerText = "❌ Не хватает монет на ставку!";
-    tg?.HapticFeedback?.notificationOccurred("error"); return;
-  }
+  if (!bet || bet <= 0 || bet > state.balance) { document.getElementById("battle-log").innerText = "❌ Не хватает монет!"; return; }
   state.balance -= bet; currentBet = bet; currentMult = 1.00; inBattle = true;
   crashPoint = Math.random() < 0.12 ? 1.05 : Math.min(15.0, parseFloat((1 / (1 - Math.random() * 0.88)).toFixed(2)));
-  const btn = document.getElementById("main-battle-btn");
-  btn.className = "action-btn btn-cashout"; btn.innerText = "💸 ЗАБРАТЬ " + bet + " 🪙";
-  document.getElementById("bet-controls").style.opacity = "0.4";
-  document.getElementById("battle-log").innerText = "⚔️ Идет замес! Успей забрать стипуху!";
-  updateUI();
+  const btn = document.getElementById("main-battle-btn"); btn.className = "action-btn btn-cashout"; btn.innerText = "💸 ЗАБРАТЬ " + bet + " 🪙";
+  document.getElementById("battle-log").innerText = "⚔️ Идет замес! Успей забрать стипуху!"; updateUI();
   battleTimer = setInterval(() => {
     currentMult += 0.04 + (currentMult * 0.015);
     const winNow = Math.floor(currentBet * currentMult);
     document.getElementById("mult-display").innerText = currentMult.toFixed(2) + "x";
     btn.innerText = "💸 ЗАБРАТЬ " + winNow + " 🪙";
-    const av = document.getElementById("boss-avatar");
-    av.style.transform = "scale(" + (1 + Math.random() * 0.12) + ") rotate(" + ((Math.random()-0.5)*10) + "deg)";
+    document.getElementById("boss-avatar").style.transform = "scale(" + (1 + Math.random()*0.12) + ") rotate(" + ((Math.random()-0.5)*10) + "deg)";
     tg?.HapticFeedback?.impactOccurred("light");
     if (currentMult >= crashPoint) loseBattle();
   }, 150);
 }
-
 function cashoutBattle() {
   clearInterval(battleTimer); inBattle = false;
-  const winAmount = Math.floor(currentBet * currentMult);
-  const damage = Math.floor(winAmount * 0.5);
-  state.balance += winAmount; state.bossHp -= damage;
-  let msg = "✅ Забрал " + winAmount + " 🪙 и снес боссу " + damage + " HP!";
+  const win = Math.floor(currentBet * currentMult), dmg = Math.floor(win * 0.5);
+  state.balance += win; state.bossHp -= dmg;
+  let msg = "✅ Забрал " + win + " 🪙 и снес " + dmg + " HP!";
   if (state.bossHp <= 0) {
-    const b = BOSSES[state.bossIdx % BOSSES.length];
-    state.balance += b.reward;
-    msg = "🏆 БОСС ПОВЕРЖЕН! Стипендия +" + b.reward + " 🪙 твоя!";
+    const b = BOSSES[state.bossIdx % BOSSES.length]; state.balance += b.reward;
+    msg = "🏆 БОСС ПОВЕРЖЕН! Стипендия +" + b.reward + " 🪙!";
     state.bossIdx++; state.bossHp = BOSSES[state.bossIdx % BOSSES.length].maxHp;
-    tg?.HapticFeedback?.notificationOccurred("success");
-  } else { tg?.HapticFeedback?.impactOccurred("heavy"); }
+  }
   resetBattleUI(msg, "#4caf50");
 }
-
 function loseBattle() {
   clearInterval(battleTimer); inBattle = false;
-  const card = document.getElementById("boss-card");
-  card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake");
   let msg = "💥 БОСС ДАЛ ОТПОР! Ты слил ставку!";
-  if (state.shields > 0) {
-    state.shields--; state.balance += currentBet;
-    msg = "🏥 Справка от врача спасла твою ставку!";
-    tg?.HapticFeedback?.notificationOccurred("warning");
-  } else { tg?.HapticFeedback?.notificationOccurred("error"); }
+  if (state.shields > 0) { state.shields--; state.balance += currentBet; msg = "🏥 Справка спасла ставку!"; }
   resetBattleUI(msg, "#ff5252");
 }
-
 function resetBattleUI(msg, color) {
-  const btn = document.getElementById("main-battle-btn");
-  btn.className = "action-btn btn-attack"; btn.innerText = "👊 НАЕХАТЬ";
-  document.getElementById("bet-controls").style.opacity = "1";
+  const btn = document.getElementById("main-battle-btn"); btn.className = "action-btn btn-attack"; btn.innerText = "👊 НАЕХАТЬ";
   document.getElementById("boss-avatar").style.transform = "scale(1)";
-  const log = document.getElementById("battle-log"); log.style.color = color; log.innerText = msg;
-  updateUI();
+  const log = document.getElementById("battle-log"); log.style.color = color; log.innerText = msg; updateUI();
 }
-
 function renderFarm() {
   const list = document.getElementById("farm-list"); list.innerHTML = "";
   UPGRADES.forEach((u, i) => {
-    const lvl = state.upgrades[i] || 0;
-    const cost = Math.floor(u.baseCost * Math.pow(1.45, lvl));
-    list.innerHTML += "<div class=\"card\"><div class=\"card-info\"><h4>" + u.name + " <span style=\"color:#ff9100;\">(ур. " + lvl + ")</span></h4><p>+" + u.income + " монет/сек</p></div><button class=\"buy-btn\" " + (state.balance < cost ? "disabled" : "") + " onclick=\"buyUpgrade(" + i + "," + cost + ")\">" + cost + " 🪙</button></div>";
+    const lvl = state.upgrades[i] || 0, cost = Math.floor(u.baseCost * Math.pow(1.45, lvl));
+    list.innerHTML += `<div class="card"><div class="card-info"><h4>${u.name} (ур. ${lvl})</h4><p>+${u.income}/сек</p></div><button class="buy-btn" ${state.balance<cost?"disabled":""} onclick="buyUpgrade(${i},${cost})">${cost} 🪙</button></div>`;
   });
 }
-
-function buyUpgrade(idx, cost) {
-  if (state.balance >= cost) { state.balance -= cost; state.upgrades[idx] = (state.upgrades[idx] || 0) + 1; tg?.HapticFeedback?.impactOccurred("medium"); updateUI(); }
-}
-
+function buyUpgrade(i, c) { if (state.balance >= c) { state.balance -= c; state.upgrades[i] = (state.upgrades[i]||0)+1; updateUI(); } }
 function renderTasks() {
   const list = document.getElementById("tasks-list"); list.innerHTML = "";
   TASKS.forEach(t => {
-    const done = state.tasksDone[t.id];
-    list.innerHTML += "<div class=\"card\"><div class=\"card-info\"><h4>" + t.title + "</h4><p>Награда: +" + t.reward + " 🪙</p></div><button class=\"buy-btn\" " + (done ? "disabled" : "") + " onclick=\"doTask('" + t.id + "'," + t.reward + ",'" + t.url + "')\">" + (done ? "Готово ✅" : "Забрать") + "</button></div>";
+    const d = state.tasksDone[t.id];
+    list.innerHTML += `<div class="card"><div class="card-info"><h4>${t.title}</h4><p>+${t.reward} 🪙</p></div><button class="buy-btn" ${d?"disabled":""} onclick="doTask('${t.id}',${t.reward},'${t.url}')">${d?"Готово ✅":"Забрать"}</button></div>`;
   });
 }
-
-function doTask(id, reward, url) {
-  if (state.tasksDone[id]) return;
-  if (tg) tg.openTelegramLink(url); else window.open(url, "_blank");
-  state.tasksDone[id] = true; state.balance += reward; updateUI();
-}
-
+function doTask(id, r, u) { if (!state.tasksDone[id]) { tg ? tg.openTelegramLink(u) : window.open(u); state.tasksDone[id]=true; state.balance+=r; updateUI(); } }
 function inviteFriend() {
-  const refLink = "https://t.me_" + uid;
-  const text = encodeURIComponent("🍗 Залетай завалить Страшного КФС-Босса и забрать стипуху! +500 монет на старте:");
-  const shareUrl = "https://t.me" + encodeURIComponent(refLink) + "&text=" + text;
-  if (tg) tg.openTelegramLink(shareUrl); else window.open(shareUrl, "_blank");
+  const link = "https://t.me_" + uid;
+  const url = "https://t.me" + encodeURIComponent(link) + "&text=" + encodeURIComponent("🍗 Завали КФС-Босса и забери стипуху!");
+  tg ? tg.openTelegramLink(url) : window.open(url);
 }
-
 function buyStars(type) {
   let link = type === "coins" ? INVOICE_COINS : (type === "vip" ? INVOICE_VIP : INVOICE_SHIELD);
-  if (tg && tg.openInvoice) {
-    tg.openInvoice(link, (status) => {
-      if (status === "paid") {
-        if (type === "coins") state.balance += 10000;
-        if (type === "vip") state.vip = true;
-        if (type === "shield") state.shields += 5;
-        tg.HapticFeedback?.notificationOccurred("success"); updateUI();
-      }
-    });
-  }
+  tg?.openInvoice?.(link, s => { if (s === "paid") { if(type==="coins") state.balance+=10000; if(type==="vip") state.vip=true; if(type==="shield") state.shields+=5; updateUI(); } });
 }
-
-function switchTab(name, btn) {
+function switchTab(n, b) {
   document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
-  document.getElementById("tab-" + name).classList.add("active");
-  btn.classList.add("active"); tg?.HapticFeedback?.selectionChanged();
+  document.querySelectorAll(".nav-btn").forEach(x => x.classList.remove("active"));
+  document.getElementById("tab-" + n).classList.add("active"); b.classList.add("active");
 }
-
-setInterval(() => {
-  const inc = getIncomePerSec();
-  if (inc > 0) { state.balance += inc; document.getElementById("balance").innerText = Math.floor(state.balance); save(); }
-}, 1000);
-
+setInterval(() => { const inc = getIncomePerSec(); if (inc > 0) { state.balance += inc; document.getElementById("balance").innerText = Math.floor(state.balance); save(); } }, 1000);
 updateUI();
 </script>
 </body>
