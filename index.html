@@ -1,115 +1,193 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head><script src="https://telegram.org/js/telegram-web-app.js"></script>
+<head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Империя Друзей 2.0</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Битва за Стипуху 2.0</title>
 <script src="https://telegram.org"></script>
 <style>
-body{background:#0f172a;color:#f8fafc;font-family:sans-serif;margin:0;padding:0 0 75px;user-select:none}
-.top{display:flex;justify-content:space-between;padding:15px;background:#1e293b;border-bottom:1px solid #334155;font-weight:bold}
-.bal{color:#f59e0b}
-.tab{display:none;padding:15px}.tab.on{display:block}
-.box{position:relative;height:200px;background:#020617;border-radius:12px;border:1px solid #334155;display:flex;align-items:center;justify-content:center;margin-bottom:12px;overflow:hidden}
-canvas{position:absolute;top:0;left:0;width:100%;height:100%}
-#x{position:relative;z-index:2;font-size:44px;font-weight:900}
-.card{background:#1e293b;padding:14px;border-radius:12px;margin-bottom:10px;border:1px solid #334155}
-.row{display:flex;gap:8px;margin-bottom:10px}
-input{width:50%;padding:12px;border-radius:8px;border:1px solid #475569;background:#0f172a;color:#fff;font-size:16px;text-align:center}
-button{border:none;border-radius:8px;padding:12px;font-weight:bold;font-size:15px;color:#fff;cursor:pointer;width:100%}
-.g{background:#10b981}.y{background:#f59e0b;color:#000}.r{background:#ef4444}.b{background:#3b82f6}
-.item{display:flex;justify-content:space-between;align-items:center}
-.nav{position:fixed;bottom:0;left:0;width:100%;background:#1e293b;display:flex;border-top:1px solid #334155}
-.nav button{background:none;color:#94a3b8;font-size:12px;padding:10px 0;border-radius:0}
-.nav button.on{color:#f59e0b}
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; user-select: none; }
+  body { background: #0f0f13; color: #fff; padding-bottom: 80px; overflow-x: hidden; }
+  
+  .header { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: #181820; border-bottom: 1px solid #2a2a36; position: sticky; top: 0; z-index: 10; }
+  .balance-box { font-size: 20px; font-weight: 800; color: #ffd700; display: flex; align-items: center; gap: 6px; }
+  .income-badge { font-size: 12px; background: rgba(76, 175, 80, 0.2); color: #4caf50; padding: 4px 8px; border-radius: 8px; font-weight: 700; }
+  .shield-badge { font-size: 12px; background: rgba(0, 229, 255, 0.2); color: #00e5ff; padding: 4px 8px; border-radius: 8px; font-weight: 700; display: none; }
+
+  .tab { display: none; padding: 16px; animation: fadeIn 0.2s ease; }
+  .tab.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  .boss-card { background: linear-gradient(145deg, #1e1e28, #14141c); border: 1px solid #2e2e3e; border-radius: 20px; padding: 18px; text-align: center; position: relative; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+  .boss-title { font-size: 18px; font-weight: 800; color: #ff5252; text-transform: uppercase; letter-spacing: 0.5px; }
+  .boss-sub { font-size: 12px; color: #9e9eb3; margin-top: 2px; }
+  .boss-avatar { font-size: 84px; margin: 14px 0; display: inline-block; transition: transform 0.1s; filter: drop-shadow(0 0 15px rgba(255, 82, 82, 0.4)); }
+  
+  .hp-wrap { background: #2a2a38; height: 14px; border-radius: 10px; overflow: hidden; margin: 10px 0 6px; position: relative; }
+  .hp-bar { background: linear-gradient(90deg, #ff1744, #ff9100); height: 100%; width: 100%; transition: width 0.2s ease; }
+  .hp-text { font-size: 12px; font-weight: 700; color: #ccc; }
+
+  .mult-display { font-size: 36px; font-weight: 900; margin: 12px 0 4px; color: #fff; text-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
+  .battle-log { font-size: 13px; color: #ffab40; min-height: 20px; font-weight: 600; margin-bottom: 12px; }
+
+  .bet-controls { display: flex; gap: 8px; margin-bottom: 12px; }
+  .bet-input { flex: 1; background: #22222e; border: 1px solid #38384a; color: #fff; font-size: 16px; font-weight: 700; padding: 12px; border-radius: 12px; text-align: center; }
+  .bet-btn-small { background: #2a2a38; border: none; color: #fff; font-weight: 700; padding: 0 14px; border-radius: 12px; cursor: pointer; }
+  
+  .action-btn { width: 100%; padding: 16px; border: none; border-radius: 14px; font-size: 17px; font-weight: 800; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; transition: transform 0.1s; }
+  .action-btn:active { transform: scale(0.97); }
+  .btn-attack { background: linear-gradient(90deg, #ff3d00, #ff9100); color: #fff; box-shadow: 0 4px 15px rgba(255, 61, 0, 0.4); }
+  .btn-cashout { background: linear-gradient(90deg, #00c853, #64dd17); color: #000; box-shadow: 0 4px 15px rgba(0, 200, 83, 0.4); }
+
+  @keyframes shake {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    20% { transform: translate(-6px, 4px) rotate(-3deg); }
+    40% { transform: translate(6px, -4px) rotate(3deg); }
+    60% { transform: translate(-5px, -3px) rotate(-2deg); }
+    80% { transform: translate(5px, 3px) rotate(2deg); }
+  }
+  .shake { animation: shake 0.35s ease; }
+
+  .card { background: #181822; border: 1px solid #282836; border-radius: 14px; padding: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+  .card-info h4 { font-size: 15px; margin-bottom: 4px; }
+  .card-info p { font-size: 12px; color: #9a9ab0; }
+  .buy-btn { background: #2979ff; color: #fff; border: none; padding: 10px 14px; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; white-space: nowrap; }
+  .buy-btn:disabled { background: #333; color: #777; }
+  .star-btn { background: linear-gradient(45deg, #ffab00, #ff6d00); color: #000; }
+
+  .ref-box { background: #181822; border: 1px solid #2e2e3e; border-radius: 16px; padding: 16px; margin: 14px 0; text-align: center; }
+  .ref-stat { font-size: 15px; margin: 8px 0; }
+  .ref-stat b { color: #ffd700; font-size: 18px; }
+
+  .nav { position: fixed; bottom: 0; left: 0; right: 0; background: #14141c; border-top: 1px solid #262633; display: flex; justify-content: space-around; padding: 8px 4px; z-index: 20; }
+  .nav-btn { background: none; border: none; color: #7a7a90; font-size: 11px; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; flex: 1; }
+  .nav-btn span { font-size: 18px; }
+  .nav-btn.active { color: #ff9100; }
 </style>
 </head>
 <body>
-<div class="top"><div>👑 Империя 2.0</div><div class="bal">🪙 <span id="b">1000</span></div></div>
 
-<div id="t1" class="tab on">
-<div class="box"><canvas id="c"></canvas><div id="x">1.00x</div></div>
-<div class="card">
-<div class="row"><input id="bet" type="number" value="100"><button class="b" style="width:50%" onclick="dbl()">x2 Ставка</button></div>
-<button id="btn" class="g" onclick="run()">🚀 ПОЛЕТЕЛИ</button>
-</div>
-</div>
-
-<div id="t2" class="tab">
-<div class="card">Доход с биржи: <b style="color:#10b981">+<span id="inc">0</span>/сек</b></div>
-<div id="m"></div>
+<div class="header">
+  <div class="balance-box">🪙 <span id="balance">1000</span></div>
+  <div style="display:flex; gap:6px; align-items:center;">
+    <div id="shield-badge" class="shield-badge">🛡️ <span id="shields">0</span></div>
+    <div class="income-badge">+<span id="income">0</span>/сек</div>
+  </div>
 </div>
 
-<div id="t3" class="tab"><div id="z"></div></div>
+<div id="tab-arena" class="tab active">
+  <div class="boss-card" id="boss-card">
+    <div class="boss-title" id="boss-name">Одногруппник-должник</div>
+    <div class="boss-sub" id="boss-desc">Просит сотку до стипухи</div>
+    <div class="boss-avatar" id="boss-avatar">🤓</div>
+    
+    <div class="hp-wrap">
+      <div class="hp-bar" id="hp-bar"></div>
+    </div>
+    <div class="hp-text">HP Босса: <span id="boss-hp">500</span> / <span id="boss-max-hp">500</span> | Куш: <span id="boss-reward">1500</span> 🪙</div>
 
-<div id="t4" class="tab">
-<div class="card item"><div><b>💰 +10,000 монет</b><br><small>На баланс</small></div><button class="y" style="width:90px" onclick="pay('coins_10k',50)">50 ⭐</button></div>
-<div class="card item"><div><b>👑 VIP x2 доход</b><br><small>Навсегда</small></div><button class="y" style="width:90px" onclick="pay('vip_status',150)">150 ⭐</button></div>
-<div class="card item"><div><b>🚀 Страховка</b><br><small>5 игр</small></div><button class="y" style="width:90px" onclick="pay('rocket_shield',75)">75 ⭐</button></div>
+    <div class="mult-display" id="mult-display">1.00x</div>
+    <div class="battle-log" id="battle-log">Сделай ставку и наедь на босса!</div>
+
+    <div class="bet-controls" id="bet-controls">
+      <button class="bet-btn-small" onclick="changeBet(0.5)">½</button>
+      <input type="number" id="bet-input" class="bet-input" value="100" min="10">
+      <button class="bet-btn-small" onclick="changeBet(2)">x2</button>
+    </div>
+
+    <button id="main-battle-btn" class="action-btn btn-attack" onclick="handleBattleBtn()">👊 НАЕХАТЬ</button>
+  </div>
+</div>
+
+<div id="tab-farm" class="tab">
+  <h3 style="margin-bottom:12px;">📈 Студенческие темки</h3>
+  <div id="farm-list"></div>
+</div>
+
+<div id="tab-friends" class="tab">
+  <h3 style="text-align:center;">👥 Позвать одногруппников</h3>
+  <p style="text-align:center; color:#9a9ab0; font-size:13px; margin-top:6px;">
+    За каждого одногруппника получай <b>+500 🪙</b> сразу и <b>+10%</b> ко всем темкам!
+  </p>
+  <div class="ref-box">
+    <div class="ref-stat">В твоей банде: <b id="ref-count">0</b> чел.</div>
+    <div class="ref-stat">Бонус с банды: <b id="ref-bonus">0</b> 🪙</div>
+    <div class="ref-stat">Буст к темкам: <b style="color:#4caf50;">+<span id="ref-boost">0</span>%</b></div>
+  </div>
+  <button class="action-btn btn-attack" onclick="inviteFriend()">📢 ПОЗВАТЬ В ЧАТ ГРУППЫ</button>
+</div>
+
+<div id="tab-tasks" class="tab">
+  <h3 style="margin-bottom:12px;">🎯 Халява на стипуху</h3>
+  <div id="tasks-list"></div>
+</div>
+
+<div id="tab-shop" class="tab">
+  <h3 style="margin-bottom:12px;">⭐ Студенческий Буфет</h3>
+  
+  <div class="card">
+    <div class="card-info">
+      <h4>👵 Бабушкин перевод</h4>
+      <p>+10,000 монет на баланс сразу</p>
+    </div>
+    <button class="buy-btn star-btn" onclick="buyStars('coins')">50 ⭐</button>
+  </div>
+
+  <div class="card">
+    <div class="card-info">
+      <h4>🎓 Повышенная стипендия (VIP)</h4>
+      <p>Доход от всех темок x2 навсегда</p>
+    </div>
+    <button id="vip-btn" class="buy-btn star-btn" onclick="buyStars('vip')">150 ⭐</button>
+  </div>
+
+  <div class="card">
+    <div class="card-info">
+      <h4>🏥 Справка от врача (5 шт.)</h4>
+      <p>Спасает ставку, если Босс тебя завалил</p>
+    </div>
+    <button class="buy-btn star-btn" onclick="buyStars('shield')">75 ⭐</button>
+  </div>
 </div>
 
 <div class="nav">
-<button class="on" onclick="sw(1,this)">🚀 Краш</button>
-<button onclick="sw(2,this)">📈 Биржа</button>
-<button onclick="sw(3,this)">🎯 Задания</button>
-<button onclick="sw(4,this)">⭐ Магазин</button>
+  <button class="nav-btn active" onclick="switchTab('arena', this)"><span>⚔️</span>Арена</button>
+  <button class="nav-btn" onclick="switchTab('farm', this)"><span>📈</span>Темки</button>
+  <button class="nav-btn" onclick="switchTab('friends', this)"><span>👥</span>Банда</button>
+  <button class="nav-btn" onclick="switchTab('tasks', this)"><span>🎯</span>Халява</button>
+  <button class="nav-btn" onclick="switchTab('shop', this)"><span>⭐</span>Буфет</button>
 </div>
 
 <script>
-let bal=1000,inc=0,vip=false,fly=false,m=1,cp=1,cb=0,tm;
-const pl=[{n:"Новичок",p:250,r:2,o:0},{n:"Трейдер",p:1200,r:12,o:0},{n:"Кит",p:5000,r:60,o:0}];
-const z=[{n:"Канал Новостей",r:500,u:"https://t.me",d:false},{n:"Чат Игроков",r:750,u:"https://t.me",d:false}];
-const cv=document.getElementById("c"),ctx=cv.getContext("2d");
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.expand(); tg.ready(); }
 
-function upd(){document.getElementById("b").innerText=Math.floor(bal);document.getElementById("inc").innerText=inc*(vip?2:1);}
-setInterval(()=>{if(inc>0){bal+=inc*(vip?2:1);upd();}},1000);
+const INVOICE_COINS  = "https://t.me";
+const INVOICE_VIP    = "https://t.me";
+const INVOICE_SHIELD = "https://t.me";
 
-function sw(n,el){
-document.querySelectorAll(".tab").forEach(e=>e.classList.remove("on"));
-document.querySelectorAll(".nav button").forEach(e=>e.classList.remove("on"));
-document.getElementById("t"+n).classList.add("on");el.classList.add("on");
-if(n===2)document.getElementById("m").innerHTML=pl.map((p,i)=>`<div class="card item"><div><b>${p.n} (Ур.${p.o})</b><br><small>+${p.r}/сек | ${p.p} 🪙</small></div><button class="g" style="width:90px" onclick="buyP(${i})">Купить</button></div>`).join("");
-if(n===3)document.getElementById("z").innerHTML=z.map((t,i)=>`<div class="card item"><div><b>${t.n}</b><br><small>+${t.r} 🪙</small></div><button class="b" style="width:90px" ${t.d?"disabled":""} onclick="doZ(${i})">${t.d?"Готово":"Жми"}</button></div>`).join("");
+const urlParams = new URLSearchParams(window.location.search);
+const uid = urlParams.get('uid') || (tg?.initDataUnsafe?.user?.id || '0');
+const refsCount = parseInt(urlParams.get('refs')) || 0;
+const refBonus = parseInt(urlParams.get('rbonus')) || 0;
+
+let state = JSON.parse(localStorage.getItem('stipend_save')) || {
+  balance: 1000,
+  bossIdx: 0,
+  bossHp: 500,
+  vip: false,
+  shields: 0,
+  claimedRef: 0,
+  upgrades: {0: 0, 1: 0, 2: 0, 3: 0},
+  tasksDone: {}
+};
+
+if (refBonus > state.claimedRef) {
+  state.balance += (refBonus - state.claimedRef);
+  state.claimedRef = refBonus;
 }
 
-function dbl(){let i=document.getElementById("bet");i.value=Math.min(Math.floor(bal),(parseInt(i.value)||10)*2);}
-
-function run(){
-let btn=document.getElementById("btn"),xd=document.getElementById("x");
-if(!fly){
-cb=parseInt(document.getElementById("bet").value);
-if(!cb||cb<10||cb>bal)return alert("Мало монет!");
-bal-=cb;upd();fly=true;m=1;
-cp=Math.random()<0.15?1.08:1.2+Math.random()*4;
-xd.style.color="#fff";btn.className="y";btn.innerText="ЗАБРАТЬ "+cb;
-tm=setInterval(()=>{
-m+=0.03;xd.innerText=m.toFixed(2)+"x";btn.innerText="ЗАБРАТЬ "+Math.floor(cb*m);
-cv.width=cv.offsetWidth;cv.height=cv.offsetHeight;ctx.clearRect(0,0,cv.width,cv.height);
-let p=Math.min((m-1)/4,1),px=30+p*(cv.width-70),py=cv.height-30-p*(cv.height-70);
-ctx.strokeStyle="#f59e0b";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(20,cv.height-20);ctx.lineTo(px,py);ctx.stroke();
-ctx.font="30px Arial";ctx.fillText("🚀",px-15,py+10);
-if(m>=cp){clearInterval(tm);fly=false;xd.innerText="💥 "+cp.toFixed(2)+"x";xd.style.color="#ef4444";btn.className="r";btn.innerText="ВЗРЫВ! Еще раз";}
-},50);
-}else{
-clearInterval(tm);fly=false;let w=Math.floor(cb*m);bal+=w;upd();
-xd.style.color="#10b981";btn.className="g";btn.innerText="ПОБЕДА +"+w+" (Еще)";
-}
-}
-
-function buyP(i){if(bal>=pl[i].p){bal-=pl[i].p;pl[i].o++;inc+=pl[i].r;pl[i].p=Math.floor(pl[i].p*1.35);upd();sw(2,document.querySelectorAll(".nav button")[1]);}}
-function doZ(i){window.open(z[i].u);setTimeout(()=>{if(!z[i].d){z[i].d=true;bal+=z[i].r;upd();sw(3,document.querySelectorAll(".nav button")[2]);}},2000);}
-const inv={coins_10k:"https://t.me/$M6gb4kEYOEgqHAAAZYY-hk0p0GA",vip_status:"https://t.me/$CgHvAEEYOEgrHAAABKa1mMBrx9g",rocket_shield:"https://t.me/$omD6rUEYOEgsHAAAWvCaiPAWpvQ"};
-function pay(it,s){
-  if(window.Telegram?.WebApp?.openInvoice && inv[it]){
-    window.Telegram.WebApp.openInvoice(inv[it], function(st){
-      if(st==="paid"){
-        if(it==="coins_10k"){bal+=10000;upd();alert("✅ +10,000 монет зачислено!");}
-        if(it==="vip_status"){vip=true;upd();alert("👑 VIP-Статус активирован!");}
-        if(it==="rocket_shield"){alert("🚀 Страховка на 5 игр активирована!");}
-      }
-    });
-  } else { alert("Откройте игру внутри Telegram!"); }
-}
-</script>
-</body>
-</html>
+const BOSSES = [
+  { name: "Одногруппник-должник", desc: "Просит сотку до стипухи", avatar: "🤓", maxHp: 500, reward: 1500 },
+  { name: "Злая Вахтёрша", desc: "Не пускает в общагу после 23:00", avatar: "👵", maxHp: 2000, reward: 5000 },
+  { name: "СТРАШНЫЙ КФС-БОСС", desc: "Охраняет острые крылышки и стипендию", avatar: "🍗", maxHp: 6000, reward: 18000 },
