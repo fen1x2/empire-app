@@ -167,19 +167,13 @@ const INVOICE_VIP    = "https://t.me";
 const INVOICE_SHIELD = "https://t.me";
 
 const urlParams = new URLSearchParams(window.location.search);
-const uid = urlParams.get('uid') || (tg?.initDataUnsafe?.user?.id || '0');
-const refsCount = parseInt(urlParams.get('refs')) || 0;
-const refBonus = parseInt(urlParams.get('rbonus')) || 0;
+const uid = urlParams.get("uid") || (tg?.initDataUnsafe?.user?.id || "0");
+const refsCount = parseInt(urlParams.get("refs")) || 0;
+const refBonus = parseInt(urlParams.get("rbonus")) || 0;
 
-let state = JSON.parse(localStorage.getItem('stipend_save')) || {
-  balance: 1000,
-  bossIdx: 0,
-  bossHp: 500,
-  vip: false,
-  shields: 0,
-  claimedRef: 0,
-  upgrades: {0: 0, 1: 0, 2: 0, 3: 0},
-  tasksDone: {}
+let state = JSON.parse(localStorage.getItem("stipend_save")) || {
+  balance: 1000, bossIdx: 0, bossHp: 500, vip: false, shields: 0, claimedRef: 0,
+  upgrades: {0: 0, 1: 0, 2: 0, 3: 0}, tasksDone: {}
 };
 
 if (refBonus > state.claimedRef) {
@@ -191,25 +185,29 @@ const BOSSES = [
   { name: "Одногруппник-должник", desc: "Просит сотку до стипухи", avatar: "🤓", maxHp: 500, reward: 1500 },
   { name: "Злая Вахтёрша", desc: "Не пускает в общагу после 23:00", avatar: "👵", maxHp: 2000, reward: 5000 },
   { name: "СТРАШНЫЙ КФС-БОСС", desc: "Охраняет острые крылышки и стипендию", avatar: "🍗", maxHp: 6000, reward: 18000 },
-
   { name: "Декан на пересдаче", desc: "Финальный босс сессии", avatar: "👨‍🏫", maxHp: 20000, reward: 75000 }
 ];
+
 const UPGRADES = [
   { name: "📝 Списывание на паре", baseCost: 150, income: 3 },
   { name: "📚 Перепродажа шпор", baseCost: 600, income: 14 },
   { name: "🌯 Шаурмечная у общаги", baseCost: 2500, income: 65 },
   { name: "💻 Курсачи на заказ", baseCost: 10000, income: 280 }
 ];
+
 const TASKS = [
   { id: "tg_chan", title: "Подписаться на канал общаги", reward: 1000, url: "https://t.me" },
   { id: "share_3", title: "Рассказать о КФС-Боссе друзьям", reward: 1500, url: "https://t.me" }
 ];
+
 function save() { localStorage.setItem("stipend_save", JSON.stringify(state)); }
+
 function getIncomePerSec() {
   let base = 0;
   UPGRADES.forEach((u, i) => base += (state.upgrades[i] || 0) * u.income);
   return Math.floor(base * (state.vip ? 2 : 1) * (1 + refsCount * 0.10));
 }
+
 function updateUI() {
   document.getElementById("balance").innerText = Math.floor(state.balance);
   document.getElementById("income").innerText = getIncomePerSec();
@@ -229,13 +227,17 @@ function updateUI() {
   if (state.vip) { const vb = document.getElementById("vip-btn"); vb.innerText = "Активно ✅"; vb.disabled = true; }
   renderFarm(); renderTasks(); save();
 }
+
 let inBattle = false, currentBet = 0, currentMult = 1.0, crashPoint = 1.0, battleTimer = null;
+
 function changeBet(f) {
   if (inBattle) return;
   const inp = document.getElementById("bet-input");
   inp.value = Math.min(Math.max(10, Math.floor((parseInt(inp.value) || 100) * f)), Math.floor(state.balance));
 }
+
 function handleBattleBtn() { if (!inBattle) startBattle(); else cashoutBattle(); }
+
 function startBattle() {
   const bet = parseInt(document.getElementById("bet-input").value);
   if (!bet || bet <= 0 || bet > state.balance) {
@@ -260,6 +262,7 @@ function startBattle() {
     if (currentMult >= crashPoint) loseBattle();
   }, 150);
 }
+
 function cashoutBattle() {
   clearInterval(battleTimer); inBattle = false;
   const winAmount = Math.floor(currentBet * currentMult);
@@ -275,6 +278,7 @@ function cashoutBattle() {
   } else { tg?.HapticFeedback?.impactOccurred("heavy"); }
   resetBattleUI(msg, "#4caf50");
 }
+
 function loseBattle() {
   clearInterval(battleTimer); inBattle = false;
   const card = document.getElementById("boss-card");
@@ -287,6 +291,7 @@ function loseBattle() {
   } else { tg?.HapticFeedback?.notificationOccurred("error"); }
   resetBattleUI(msg, "#ff5252");
 }
+
 function resetBattleUI(msg, color) {
   const btn = document.getElementById("main-battle-btn");
   btn.className = "action-btn btn-attack"; btn.innerText = "👊 НАЕХАТЬ";
@@ -295,35 +300,41 @@ function resetBattleUI(msg, color) {
   const log = document.getElementById("battle-log"); log.style.color = color; log.innerText = msg;
   updateUI();
 }
+
 function renderFarm() {
   const list = document.getElementById("farm-list"); list.innerHTML = "";
   UPGRADES.forEach((u, i) => {
     const lvl = state.upgrades[i] || 0;
     const cost = Math.floor(u.baseCost * Math.pow(1.45, lvl));
-    list.innerHTML += "<div class="card"><div class="card-info"><h4>" + u.name + " <span style="color:#ff9100;">(ур. " + lvl + ")</span></h4><p>+" + u.income + " монет/сек</p></div><button class="buy-btn" " + (state.balance < cost ? "disabled" : "") + " onclick="buyUpgrade(" + i + "," + cost + ")">" + cost + " 🪙</button></div>";
+    list.innerHTML += "<div class=\"card\"><div class=\"card-info\"><h4>" + u.name + " <span style=\"color:#ff9100;\">(ур. " + lvl + ")</span></h4><p>+" + u.income + " монет/сек</p></div><button class=\"buy-btn\" " + (state.balance < cost ? "disabled" : "") + " onclick=\"buyUpgrade(" + i + "," + cost + ")\">" + cost + " 🪙</button></div>";
   });
 }
+
 function buyUpgrade(idx, cost) {
   if (state.balance >= cost) { state.balance -= cost; state.upgrades[idx] = (state.upgrades[idx] || 0) + 1; tg?.HapticFeedback?.impactOccurred("medium"); updateUI(); }
 }
+
 function renderTasks() {
   const list = document.getElementById("tasks-list"); list.innerHTML = "";
   TASKS.forEach(t => {
     const done = state.tasksDone[t.id];
-    list.innerHTML += "<div class="card"><div class="card-info"><h4>" + t.title + "</h4><p>Награда: +" + t.reward + " 🪙</p></div><button class="buy-btn" " + (done ? "disabled" : "") + " onclick="doTask('" + t.id + "'," + t.reward + ",'" + t.url + "')">" + (done ? "Готово ✅" : "Забрать") + "</button></div>";
+    list.innerHTML += "<div class=\"card\"><div class=\"card-info\"><h4>" + t.title + "</h4><p>Награда: +" + t.reward + " 🪙</p></div><button class=\"buy-btn\" " + (done ? "disabled" : "") + " onclick=\"doTask('" + t.id + "'," + t.reward + ",'" + t.url + "')\">" + (done ? "Готово ✅" : "Забрать") + "</button></div>";
   });
 }
+
 function doTask(id, reward, url) {
   if (state.tasksDone[id]) return;
   if (tg) tg.openTelegramLink(url); else window.open(url, "_blank");
   state.tasksDone[id] = true; state.balance += reward; updateUI();
 }
+
 function inviteFriend() {
   const refLink = "https://t.me_" + uid;
   const text = encodeURIComponent("🍗 Залетай завалить Страшного КФС-Босса и забрать стипуху! +500 монет на старте:");
   const shareUrl = "https://t.me" + encodeURIComponent(refLink) + "&text=" + text;
   if (tg) tg.openTelegramLink(shareUrl); else window.open(shareUrl, "_blank");
 }
+
 function buyStars(type) {
   let link = type === "coins" ? INVOICE_COINS : (type === "vip" ? INVOICE_VIP : INVOICE_SHIELD);
   if (tg && tg.openInvoice) {
@@ -337,16 +348,19 @@ function buyStars(type) {
     });
   }
 }
+
 function switchTab(name, btn) {
   document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
   document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
   document.getElementById("tab-" + name).classList.add("active");
   btn.classList.add("active"); tg?.HapticFeedback?.selectionChanged();
 }
+
 setInterval(() => {
   const inc = getIncomePerSec();
   if (inc > 0) { state.balance += inc; document.getElementById("balance").innerText = Math.floor(state.balance); save(); }
 }, 1000);
+
 updateUI();
 </script>
 </body>
